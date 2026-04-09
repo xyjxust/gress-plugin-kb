@@ -1,0 +1,503 @@
+0 verbose cli /Users/mu/.nvm/versions/node/v18.18.2/bin/node /Users/mu/Tools/node/node-v23.9.0-darwin-arm64/bin/npm
+1 info using npm@10.9.2
+2 info using node@v18.18.2
+3 silly config load:file:/Users/mu/Tools/node/node-v23.9.0-darwin-arm64/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/.npmrc
+5 silly config load:file:/Users/mu/.npmrc
+6 silly config load:file:/Users/mu/.nvm/versions/node/v18.18.2/etc/npmrc
+7 verbose title npm install @tiptap/extension-text-align
+8 verbose argv "install" "--registry" "https://registry.npmjs.org" "--cache" "./.npm-cache" "@tiptap/extension-text-align"
+9 verbose logfile logs-max:10 dir:/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/.npm-cache/_logs/2026-04-01T06_12_44_414Z-
+10 verbose logfile /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/.npm-cache/_logs/2026-04-01T06_12_44_414Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 silly idealTree buildDeps
+14 silly fetch manifest @tiptap/extension-text-align@*
+15 silly packumentCache full:https://registry.npmjs.org/@tiptap%2fextension-text-align cache-miss
+16 http fetch GET 200 https://registry.npmjs.org/@tiptap%2fextension-text-align 1434ms (cache miss)
+17 silly packumentCache full:https://registry.npmjs.org/@tiptap%2fextension-text-align set size:undefined disposed:false
+18 silly fetch manifest @tiptap/core@^3.22.0
+19 silly packumentCache full:https://registry.npmjs.org/@tiptap%2fcore cache-miss
+20 http fetch GET 200 https://registry.npmjs.org/@tiptap%2fcore 870ms (cache miss)
+21 silly packumentCache full:https://registry.npmjs.org/@tiptap%2fcore set size:undefined disposed:false
+22 silly fetch manifest @tiptap/pm@^3.22.0
+23 silly packumentCache full:https://registry.npmjs.org/@tiptap%2fpm cache-miss
+24 http fetch GET 200 https://registry.npmjs.org/@tiptap%2fpm 1201ms (cache miss)
+25 silly packumentCache full:https://registry.npmjs.org/@tiptap%2fpm set size:undefined disposed:false
+26 silly placeDep ROOT @tiptap/extension-text-align@3.22.0 OK for: @keqi.gress/plugin-kb-frontend@1.0.0 want: *
+27 warn EBADENGINE Unsupported engine {
+27 warn EBADENGINE   package: 'naive-ui@2.44.1',
+27 warn EBADENGINE   required: { node: '>=20' },
+27 warn EBADENGINE   current: { node: 'v18.18.2', npm: '10.9.2' }
+27 warn EBADENGINE }
+28 silly reify moves {}
+29 silly audit bulk request {
+29 silly audit   '@babel/helper-string-parser': [ '7.27.1' ],
+29 silly audit   '@babel/helper-validator-identifier': [ '7.28.5' ],
+29 silly audit   '@babel/parser': [ '7.29.2' ],
+29 silly audit   '@babel/types': [ '7.29.0' ],
+29 silly audit   '@css-render/plugin-bem': [ '0.15.14' ],
+29 silly audit   '@css-render/vue3-ssr': [ '0.15.14' ],
+29 silly audit   '@emotion/hash': [ '0.8.0' ],
+29 silly audit   '@esbuild/aix-ppc64': [ '0.21.5' ],
+29 silly audit   '@esbuild/android-arm': [ '0.21.5' ],
+29 silly audit   '@esbuild/android-arm64': [ '0.21.5' ],
+29 silly audit   '@esbuild/android-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/darwin-arm64': [ '0.21.5' ],
+29 silly audit   '@esbuild/darwin-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/freebsd-arm64': [ '0.21.5' ],
+29 silly audit   '@esbuild/freebsd-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-arm': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-arm64': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-ia32': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-loong64': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-mips64el': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-ppc64': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-riscv64': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-s390x': [ '0.21.5' ],
+29 silly audit   '@esbuild/linux-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/netbsd-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/openbsd-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/sunos-x64': [ '0.21.5' ],
+29 silly audit   '@esbuild/win32-arm64': [ '0.21.5' ],
+29 silly audit   '@esbuild/win32-ia32': [ '0.21.5' ],
+29 silly audit   '@esbuild/win32-x64': [ '0.21.5' ],
+29 silly audit   '@floating-ui/core': [ '1.7.5' ],
+29 silly audit   '@floating-ui/dom': [ '1.7.6' ],
+29 silly audit   '@floating-ui/utils': [ '0.2.11' ],
+29 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.5' ],
+29 silly audit   '@juggle/resize-observer': [ '3.4.0' ],
+29 silly audit   '@keqi.gress/plugin-bridge': [ '1.0.0' ],
+29 silly audit   '@keqi.gress/plugin-ui': [ '1.3.0' ],
+29 silly audit   '@keqi.gress/shared-utils': [ '1.0.3' ],
+29 silly audit   '@mixmark-io/domino': [ '2.2.0' ],
+29 silly audit   '@remirror/core-constants': [ '3.0.0' ],
+29 silly audit   '@rollup/rollup-android-arm-eabi': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-android-arm64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-darwin-arm64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-darwin-x64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-freebsd-arm64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-freebsd-x64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-arm-gnueabihf': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-arm-musleabihf': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-arm64-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-arm64-musl': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-loong64-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-loong64-musl': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-ppc64-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-ppc64-musl': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-riscv64-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-riscv64-musl': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-s390x-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-x64-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-linux-x64-musl': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-openbsd-x64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-openharmony-arm64': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-win32-arm64-msvc': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-win32-ia32-msvc': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-win32-x64-gnu': [ '4.60.1' ],
+29 silly audit   '@rollup/rollup-win32-x64-msvc': [ '4.60.1' ],
+29 silly audit   '@tiptap/core': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-blockquote': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-bold': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-bubble-menu': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-bullet-list': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-code': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-code-block': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-color': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-document': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-dropcursor': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-floating-menu': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-gapcursor': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-hard-break': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-heading': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-highlight': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-horizontal-rule': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-image': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-italic': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-link': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-list': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-list-item': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-list-keymap': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-ordered-list': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-paragraph': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-placeholder': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-strike': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-text': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-text-style': [ '3.22.0' ],
+29 silly audit   '@tiptap/extension-underline': [ '3.22.0' ],
+29 silly audit   '@tiptap/extensions': [ '3.22.0' ],
+29 silly audit   '@tiptap/pm': [ '3.22.0' ],
+29 silly audit   '@tiptap/starter-kit': [ '3.22.0' ],
+29 silly audit   '@tiptap/suggestion': [ '3.22.0' ],
+29 silly audit   '@tiptap/vue-3': [ '3.22.0' ],
+29 silly audit   '@types/estree': [ '1.0.8' ],
+29 silly audit   '@types/linkify-it': [ '5.0.0' ],
+29 silly audit   '@types/lodash': [ '4.17.24' ],
+29 silly audit   '@types/lodash-es': [ '4.17.12' ],
+29 silly audit   '@types/markdown-it': [ '14.1.2' ],
+29 silly audit   '@types/marked': [ '5.0.2' ],
+29 silly audit   '@types/mdurl': [ '2.0.0' ],
+29 silly audit   '@types/turndown': [ '5.0.6' ],
+29 silly audit   '@vitejs/plugin-vue': [ '5.2.4' ],
+29 silly audit   '@vue/compiler-core': [ '3.5.31' ],
+29 silly audit   '@vue/compiler-dom': [ '3.5.31' ],
+29 silly audit   '@vue/compiler-sfc': [ '3.5.31' ],
+29 silly audit   '@vue/compiler-ssr': [ '3.5.31' ],
+29 silly audit   '@vue/devtools-api': [ '6.6.4' ],
+29 silly audit   '@vue/reactivity': [ '3.5.31' ],
+29 silly audit   '@vue/runtime-core': [ '3.5.31' ],
+29 silly audit   '@vue/runtime-dom': [ '3.5.31' ],
+29 silly audit   '@vue/server-renderer': [ '3.5.31' ],
+29 silly audit   '@vue/shared': [ '3.5.31' ],
+29 silly audit   argparse: [ '2.0.1' ],
+29 silly audit   'async-validator': [ '4.2.5' ],
+29 silly audit   asynckit: [ '0.4.0' ],
+29 silly audit   axios: [ '1.14.0' ],
+29 silly audit   'call-bind-apply-helpers': [ '1.0.2' ],
+29 silly audit   'combined-stream': [ '1.0.8' ],
+29 silly audit   crelt: [ '1.0.6' ],
+29 silly audit   'css-render': [ '0.15.14' ],
+29 silly audit   csstype: [ '3.0.11', '3.2.3' ],
+29 silly audit   'date-fns': [ '4.1.0' ],
+29 silly audit   'date-fns-tz': [ '3.2.0' ],
+29 silly audit   'delayed-stream': [ '1.0.0' ],
+29 silly audit   'dunder-proto': [ '1.0.1' ],
+29 silly audit   entities: [ '7.0.1', '4.5.0' ],
+29 silly audit   'es-define-property': [ '1.0.1' ],
+29 silly audit   'es-errors': [ '1.3.0' ],
+29 silly audit   'es-object-atoms': [ '1.1.1' ],
+29 silly audit   'es-set-tostringtag': [ '2.1.0' ],
+29 silly audit   esbuild: [ '0.21.5' ],
+29 silly audit   'escape-string-regexp': [ '4.0.0' ],
+29 silly audit   'estree-walker': [ '2.0.2' ],
+29 silly audit   evtd: [ '0.2.4' ],
+29 silly audit   'follow-redirects': [ '1.15.11' ],
+29 silly audit   'form-data': [ '4.0.5' ],
+29 silly audit   fsevents: [ '2.3.3' ],
+29 silly audit   'function-bind': [ '1.1.2' ],
+29 silly audit   'get-intrinsic': [ '1.3.0' ],
+29 silly audit   'get-proto': [ '1.0.1' ],
+29 silly audit   gopd: [ '1.2.0' ],
+29 silly audit   'has-symbols': [ '1.1.0' ],
+29 silly audit   'has-tostringtag': [ '1.0.2' ],
+29 silly audit   hasown: [ '2.0.2' ],
+29 silly audit   'highlight.js': [ '11.11.1' ],
+29 silly audit   'linkify-it': [ '5.0.0' ],
+29 silly audit   linkifyjs: [ '4.3.2' ],
+29 silly audit   lodash: [ '4.17.23' ],
+29 silly audit   'lodash-es': [ '4.17.23' ],
+29 silly audit   'magic-string': [ '0.30.21' ],
+29 silly audit   'markdown-it': [ '14.1.1' ],
+29 silly audit   marked: [ '15.0.12' ],
+29 silly audit   'math-intrinsics': [ '1.1.0' ],
+29 silly audit   mdurl: [ '2.0.0' ],
+29 silly audit   'mime-db': [ '1.52.0' ],
+29 silly audit   'mime-types': [ '2.1.35' ],
+29 silly audit   'naive-ui': [ '2.44.1' ],
+29 silly audit   nanoid: [ '3.3.11' ],
+29 silly audit   orderedmap: [ '2.1.1' ],
+29 silly audit   picocolors: [ '1.1.1' ],
+29 silly audit   pinia: [ '2.3.1' ],
+29 silly audit   postcss: [ '8.5.8' ],
+29 silly audit   'prosemirror-changeset': [ '2.4.0' ],
+29 silly audit   'prosemirror-collab': [ '1.3.1' ],
+29 silly audit   'prosemirror-commands': [ '1.7.1' ],
+29 silly audit   'prosemirror-dropcursor': [ '1.8.2' ],
+29 silly audit   'prosemirror-gapcursor': [ '1.4.1' ],
+29 silly audit   'prosemirror-history': [ '1.5.0' ],
+29 silly audit   'prosemirror-inputrules': [ '1.5.1' ],
+29 silly audit   'prosemirror-keymap': [ '1.2.3' ],
+29 silly audit   'prosemirror-markdown': [ '1.13.4' ],
+29 silly audit   'prosemirror-menu': [ '1.3.0' ],
+29 silly audit   'prosemirror-model': [ '1.25.4' ],
+29 silly audit   'prosemirror-schema-basic': [ '1.2.4' ],
+29 silly audit   'prosemirror-schema-list': [ '1.5.1' ],
+29 silly audit   'prosemirror-state': [ '1.4.4' ],
+29 silly audit   'prosemirror-tables': [ '1.8.5' ],
+29 silly audit   'prosemirror-trailing-node': [ '3.0.0' ],
+29 silly audit   'prosemirror-transform': [ '1.12.0' ],
+29 silly audit   'prosemirror-view': [ '1.41.7' ],
+29 silly audit   'proxy-from-env': [ '2.1.0' ],
+29 silly audit   'punycode.js': [ '2.3.1' ],
+29 silly audit   rollup: [ '4.60.1' ],
+29 silly audit   'rope-sequence': [ '1.3.4' ],
+29 silly audit   seemly: [ '0.3.10' ],
+29 silly audit   'source-map-js': [ '1.2.1' ],
+29 silly audit   treemate: [ '0.3.11' ],
+29 silly audit   turndown: [ '7.2.2' ],
+29 silly audit   typescript: [ '5.9.3' ],
+29 silly audit   'uc.micro': [ '2.1.0' ],
+29 silly audit   vdirs: [ '0.1.8' ],
+29 silly audit   vite: [ '5.4.21' ],
+29 silly audit   vooks: [ '0.2.12' ],
+29 silly audit   vue: [ '3.5.31' ],
+29 silly audit   'vue-demi': [ '0.14.10' ],
+29 silly audit   'vue-router': [ '4.6.4' ],
+29 silly audit   vueuc: [ '0.4.65' ],
+29 silly audit   'w3c-keyname': [ '2.2.8' ],
+29 silly audit   '@tiptap/extension-text-align': [ '3.22.0' ]
+29 silly audit }
+30 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-x64-msvc
+31 silly reify mark deleted [
+31 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-x64-msvc'
+31 silly reify ]
+32 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-x64-gnu
+33 silly reify mark deleted [
+33 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-x64-gnu'
+33 silly reify ]
+34 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-ia32-msvc
+35 silly reify mark deleted [
+35 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-ia32-msvc'
+35 silly reify ]
+36 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-arm64-msvc
+37 silly reify mark deleted [
+37 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-win32-arm64-msvc'
+37 silly reify ]
+38 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-openharmony-arm64
+39 silly reify mark deleted [
+39 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-openharmony-arm64'
+39 silly reify ]
+40 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-openbsd-x64
+41 silly reify mark deleted [
+41 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-openbsd-x64'
+41 silly reify ]
+42 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-x64-musl
+43 silly reify mark deleted [
+43 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-x64-musl'
+43 silly reify ]
+44 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-x64-gnu
+45 silly reify mark deleted [
+45 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-x64-gnu'
+45 silly reify ]
+46 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-s390x-gnu
+47 silly reify mark deleted [
+47 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-s390x-gnu'
+47 silly reify ]
+48 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-riscv64-musl
+49 silly reify mark deleted [
+49 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-riscv64-musl'
+49 silly reify ]
+50 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-riscv64-gnu
+51 silly reify mark deleted [
+51 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-riscv64-gnu'
+51 silly reify ]
+52 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-ppc64-musl
+53 silly reify mark deleted [
+53 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-ppc64-musl'
+53 silly reify ]
+54 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-ppc64-gnu
+55 silly reify mark deleted [
+55 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-ppc64-gnu'
+55 silly reify ]
+56 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-loong64-musl
+57 silly reify mark deleted [
+57 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-loong64-musl'
+57 silly reify ]
+58 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-loong64-gnu
+59 silly reify mark deleted [
+59 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-loong64-gnu'
+59 silly reify ]
+60 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm64-musl
+61 silly reify mark deleted [
+61 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm64-musl'
+61 silly reify ]
+62 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm64-gnu
+63 silly reify mark deleted [
+63 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm64-gnu'
+63 silly reify ]
+64 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm-musleabihf
+65 silly reify mark deleted [
+65 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm-musleabihf'
+65 silly reify ]
+66 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm-gnueabihf
+67 silly reify mark deleted [
+67 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-linux-arm-gnueabihf'
+67 silly reify ]
+68 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-freebsd-x64
+69 silly reify mark deleted [
+69 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-freebsd-x64'
+69 silly reify ]
+70 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-freebsd-arm64
+71 silly reify mark deleted [
+71 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-freebsd-arm64'
+71 silly reify ]
+72 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-darwin-x64
+73 silly reify mark deleted [
+73 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-darwin-x64'
+73 silly reify ]
+74 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-android-arm64
+75 silly reify mark deleted [
+75 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-android-arm64'
+75 silly reify ]
+76 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-android-arm-eabi
+77 silly reify mark deleted [
+77 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@rollup/rollup-android-arm-eabi'
+77 silly reify ]
+78 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/win32-x64
+79 silly reify mark deleted [
+79 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/win32-x64'
+79 silly reify ]
+80 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/win32-ia32
+81 silly reify mark deleted [
+81 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/win32-ia32'
+81 silly reify ]
+82 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/win32-arm64
+83 silly reify mark deleted [
+83 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/win32-arm64'
+83 silly reify ]
+84 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/sunos-x64
+85 silly reify mark deleted [
+85 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/sunos-x64'
+85 silly reify ]
+86 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/openbsd-x64
+87 silly reify mark deleted [
+87 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/openbsd-x64'
+87 silly reify ]
+88 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/netbsd-x64
+89 silly reify mark deleted [
+89 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/netbsd-x64'
+89 silly reify ]
+90 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-x64
+91 silly reify mark deleted [
+91 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-x64'
+91 silly reify ]
+92 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-s390x
+93 silly reify mark deleted [
+93 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-s390x'
+93 silly reify ]
+94 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-riscv64
+95 silly reify mark deleted [
+95 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-riscv64'
+95 silly reify ]
+96 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-ppc64
+97 silly reify mark deleted [
+97 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-ppc64'
+97 silly reify ]
+98 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-mips64el
+99 silly reify mark deleted [
+99 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-mips64el'
+99 silly reify ]
+100 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-loong64
+101 silly reify mark deleted [
+101 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-loong64'
+101 silly reify ]
+102 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-ia32
+103 silly reify mark deleted [
+103 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-ia32'
+103 silly reify ]
+104 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-arm64
+105 silly reify mark deleted [
+105 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-arm64'
+105 silly reify ]
+106 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-arm
+107 silly reify mark deleted [
+107 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/linux-arm'
+107 silly reify ]
+108 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/freebsd-x64
+109 silly reify mark deleted [
+109 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/freebsd-x64'
+109 silly reify ]
+110 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/freebsd-arm64
+111 silly reify mark deleted [
+111 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/freebsd-arm64'
+111 silly reify ]
+112 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/darwin-x64
+113 silly reify mark deleted [
+113 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/darwin-x64'
+113 silly reify ]
+114 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/android-x64
+115 silly reify mark deleted [
+115 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/android-x64'
+115 silly reify ]
+116 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/android-arm64
+117 silly reify mark deleted [
+117 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/android-arm64'
+117 silly reify ]
+118 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/android-arm
+119 silly reify mark deleted [
+119 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/android-arm'
+119 silly reify ]
+120 verbose reify failed optional dependency /Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/aix-ppc64
+121 silly reify mark deleted [
+121 silly reify   '/Users/mu/songtsam/project/self/gress-plugin-kb/frontend/node_modules/@esbuild/aix-ppc64'
+121 silly reify ]
+122 http cache @tiptap/extension-text-align@https://registry.npmjs.org/@tiptap/extension-text-align/-/extension-text-align-3.22.0.tgz 0ms (cache hit)
+123 silly tarball no local data for @tiptap/extension-text-align@https://registry.npmjs.org/@tiptap/extension-text-align/-/extension-text-align-3.22.0.tgz. Extracting by manifest.
+124 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 510ms
+125 silly audit report {
+125 silly audit report   esbuild: [
+125 silly audit report     {
+125 silly audit report       id: 1102341,
+125 silly audit report       url: 'https://github.com/advisories/GHSA-67mh-4wv8-2f99',
+125 silly audit report       title: 'esbuild enables any website to send any requests to the development server and read the response',
+125 silly audit report       severity: 'moderate',
+125 silly audit report       vulnerable_versions: '<=0.24.2',
+125 silly audit report       cwe: [Array],
+125 silly audit report       cvss: [Object]
+125 silly audit report     }
+125 silly audit report   ]
+125 silly audit report }
+126 silly packumentCache corgi:https://registry.npmjs.org/esbuild cache-miss
+127 http fetch GET 200 https://registry.npmjs.org/@tiptap/extension-text-align/-/extension-text-align-3.22.0.tgz 1014ms (cache miss)
+128 http fetch GET 200 https://registry.npmjs.org/esbuild 823ms (cache miss)
+129 silly packumentCache corgi:https://registry.npmjs.org/esbuild set size:undefined disposed:false
+130 silly packumentCache corgi:https://registry.npmjs.org/vite cache-miss
+131 http fetch GET 200 https://registry.npmjs.org/vite 1204ms (cache miss)
+132 silly packumentCache corgi:https://registry.npmjs.org/vite set size:undefined disposed:false
+133 silly packumentCache corgi:https://registry.npmjs.org/@vitejs%2fplugin-vue cache-miss
+134 http fetch GET 200 https://registry.npmjs.org/@vitejs%2fplugin-vue 540ms (cache miss)
+135 silly packumentCache corgi:https://registry.npmjs.org/@vitejs%2fplugin-vue set size:undefined disposed:false
+136 silly ADD node_modules/@tiptap/extension-text-align
+137 silly ADD
+138 silly ADD
+139 silly ADD
+140 silly ADD
+141 silly ADD
+142 silly ADD
+143 silly ADD
+144 silly ADD
+145 silly ADD
+146 silly ADD
+147 silly ADD
+148 silly ADD
+149 silly ADD
+150 silly ADD
+151 silly ADD
+152 silly ADD
+153 silly ADD
+154 silly ADD
+155 silly ADD
+156 silly ADD
+157 silly ADD
+158 silly ADD
+159 silly ADD
+160 silly ADD
+161 silly ADD
+162 silly ADD
+163 silly ADD
+164 silly ADD
+165 silly ADD
+166 silly ADD
+167 silly ADD
+168 silly ADD
+169 silly ADD
+170 silly ADD
+171 silly ADD
+172 silly ADD
+173 silly ADD
+174 silly ADD
+175 silly ADD
+176 silly ADD
+177 silly ADD
+178 silly ADD
+179 silly ADD
+180 silly ADD
+181 silly ADD
+182 silly ADD
+183 verbose cwd /Users/mu/songtsam/project/self/gress-plugin-kb/frontend
+184 verbose os Darwin 24.3.0
+185 verbose node v18.18.2
+186 verbose npm  v10.9.2
+187 verbose exit 0
+188 info ok

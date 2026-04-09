@@ -1,0 +1,82 @@
+plugin:
+  id: kb
+  name: 知识库
+  version: 1.0.1
+  hasWidget: false
+  hasPanel: false
+
+menus:
+  - id: kb-docs
+    title: 文档与知识库
+    icon: BookOutline
+    path: /plugins/kb/docs
+    component: KnowledgeBase
+    order: 30
+    apiPrefix: /api/v2/plugins/kb/kb
+    operations:
+      - VIEW
+      - MANAGE
+
+    buttons:
+      - id: refresh
+        label: 刷新
+        path: GET:/api/v2/plugins/kb/kb/tree
+      - id: create
+        label: 新建文档
+        path: POST:/api/v2/plugins/kb/kb/docs
+      - id: save
+        label: 保存草稿
+        path: PUT:/api/v2/plugins/kb/kb/docs/{docId}
+      - id: publish
+        label: 发布
+        path: POST:/api/v2/plugins/kb/kb/docs/{docId}/publish
+      - id: delete
+        label: 删除
+        path: DELETE:/api/v2/plugins/kb/kb/docs/{docId}
+  - id: kb-site
+    title: 站点管理
+    icon: GlobeOutline
+    path: /plugins/kb/site
+    component: KbSiteManage
+    order: 31
+    apiPrefix: /api/v2/plugins/kb/kb
+    operations:
+      - VIEW
+      - MANAGE
+    buttons:
+      - id: nav-tree
+        label: 读取导航树
+        path: GET:/api/v2/plugins/kb/kb/admin/nav/tree
+      - id: nav-publish
+        label: 发布导航
+        path: POST:/api/v2/plugins/kb/kb/admin/nav/publish
+
+  - id: kb-site-access
+    title: 站点访问
+    icon: GlobeOutline
+    path: /sites
+    component: KbSitePreview
+    order: 5
+    type: 'standalone'
+    operations:
+      - VIEW
+
+roles:
+  - code: viewer
+    name: 知识库查看者
+    description: 可浏览文档
+    permissions:
+      - kb-docs:VIEW
+      - kb-site:VIEW
+      - kb-site-access:VIEW
+  - code: editor
+    name: 知识库编辑者
+    description: 可编辑与发布文档
+    permissions:
+      - kb-docs:VIEW,MANAGE
+      - kb-docs.*
+      - kb-site:VIEW,MANAGE
+      - kb-site.*
+      - kb-site-access:VIEW
+      - kb-site-access.*
+
