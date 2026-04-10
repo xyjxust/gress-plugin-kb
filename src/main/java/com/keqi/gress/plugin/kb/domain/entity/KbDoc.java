@@ -16,6 +16,15 @@ public class KbDoc {
     private Long parentId;
     private String slug;
     private String title;
+    /**
+     * 文档类型：
+     * - EDITOR：正文由编辑器（bodyMd/bodyHtml）驱动
+     * - COMPONENT：正文由页面组件驱动（componentCategory/componentName/componentPropsJson）
+     */
+    private String docType; // EDITOR / COMPONENT
+    private String componentCategory;
+    private String componentName;
+    private String componentPropsJson;
     private String bodyMd;
     private String bodyHtml;
     private String status; // DRAFT / PUBLISHED

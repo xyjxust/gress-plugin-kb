@@ -1,7 +1,7 @@
 <template>
   <article class="sr-content">
     <!-- 文档头部 -->
-    <header v-if="page" class="sr-content__header">
+    <header v-if="page && !resolvedPageComponent" class="sr-content__header">
       <h1 class="sr-content__title">{{ page.title }}</h1>
       <p
         v-if="page.description && !page.meta?.kbDocListSource"
@@ -16,8 +16,16 @@
       </div>
     </header>
 
+    <!-- 扩展页面组件（用于“编辑器无法表达”的复杂交互页） -->
+    <div v-if="resolvedPageComponent" class="sr-content__body sr-content__body--component">
+      <component
+        :is="resolvedPageComponent"
+        v-bind="pageComponentProps"
+      />
+    </div>
+
     <!-- 与 KbDocList 同源的 kb 文档：走 KbDocBody（含存储下载链接改写） -->
-    <div v-if="page?.meta?.kbDocListSource" class="sr-content__body sr-content__body--kb">
+    <div v-else-if="page?.meta?.kbDocListSource" class="sr-content__body sr-content__body--kb">
       <KbDocBody
         :doc="page.meta.kbDoc ?? null"
         :loading="!!page.meta.kbDocLoading"
@@ -36,17 +44,76 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { PageData } from '../../../types/siteRenderer'
+import { computed, inject } from 'vue'
+import type { Component } from 'vue'
+import type { PageData, SiteRendererConfig } from '../../../types/siteRenderer'
 import KbDocBody from '../../KbDocBody.vue'
 
 const props = defineProps<{
   page?: PageData | null
+  config?: SiteRendererConfig
 }>()
 
 const showMeta = computed(
   () => props.page && (props.page.updatedAt || props.page.readTime || props.page.author)
 )
+
+// 宿主共享组件注册表 getter（与 codegen/SystemSettings.vue 同款模式）
+const SHARED_GET_REGISTRY_KEY = 'sharedComponentsGetRegistry'
+const sharedGetRegistry = inject<((category: string) => Record<string, Component>) | undefined>(
+  SHARED_GET_REGISTRY_KEY,
+  undefined
+)
+
+type RenderComponentRef = { category: string; name: string; props?: Record<string, any> }
+
+const renderComponentRef = computed<RenderComponentRef | null>(() => {
+  const meta = props.page?.meta as any
+  // 1) 优先显式 renderComponent（站点配置或 hydrate 时写入）
+  const raw = meta?.renderComponent
+  if (raw) {
+    const category = String(raw.category || '').trim()
+    const name = String(raw.name || '').trim()
+    if (category && name) return { category, name, props: (raw.props || {}) as Record<string, any> }
+  }
+
+  // 2) 兼容：KB 文档页（kbDocListSource）里若 kbDoc.docType=COMPONENT，则直接从 kbDoc 派生组件引用
+  const kbDoc = meta?.kbDoc
+  const dt = String(kbDoc?.docType || '').toUpperCase()
+  if (dt === 'COMPONENT') {
+    const category = String(kbDoc?.componentCategory || '').trim()
+    const name = String(kbDoc?.componentName || '').trim()
+    if (!category || !name) return null
+    let props: Record<string, any> = {}
+    const rawJson = kbDoc?.componentPropsJson
+    if (typeof rawJson === 'string' && rawJson.trim()) {
+      try {
+        props = JSON.parse(rawJson)
+      } catch {
+        props = {}
+      }
+    }
+    return { category, name, props }
+  }
+
+  return null
+})
+
+const resolvedPageComponent = computed<Component | null>(() => {
+  const ref = renderComponentRef.value
+  if (!ref || !sharedGetRegistry) return null
+  return sharedGetRegistry(ref.category)?.[ref.name] || null
+})
+
+const pageComponentProps = computed(() => {
+  const ref = renderComponentRef.value
+  const extProps = ref?.props || {}
+  return {
+    ...extProps,
+    page: props.page || null,
+    siteConfig: props.config || null,
+  }
+})
 </script>
 
 <style scoped>

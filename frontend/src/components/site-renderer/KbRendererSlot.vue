@@ -8,10 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, type Component } from 'vue'
+import { computed, type Component } from 'vue'
 import type { SlotComponentInstance } from '../../types/siteRenderer'
-import KbSlotAdBanner from './slot-components/KbSlotAdBanner.vue'
-import KbSlotAnnouncement from './slot-components/KbSlotAnnouncement.vue'
+import { getSlotComponent } from './slotRegistry'
 
 const props = defineProps<{
   instance: SlotComponentInstance
@@ -19,12 +18,9 @@ const props = defineProps<{
 
 defineEmits<{ close: [] }>()
 
-const BUILTIN_MAP: Record<string, Component> = {
-  AdBanner: markRaw(KbSlotAdBanner),
-  Announcement: markRaw(KbSlotAnnouncement),
-}
-
 const resolvedComponent = computed(() => {
-  return BUILTIN_MAP[props.instance.componentKey] || null
+  const key = props.instance.componentKey
+  if (!key) return null
+  return (getSlotComponent(key) as Component | undefined) || null
 })
 </script>

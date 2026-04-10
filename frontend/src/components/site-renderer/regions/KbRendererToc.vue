@@ -1,16 +1,17 @@
 <template>
   <nav v-if="items.length" class="sr-toc">
     <div class="sr-toc__title">本页目录</div>
-    <a
+    <!-- 不用 href="#id"：hash 路由下会覆盖整个 #/... 导致地址栏变成 /#标题、路由丢失 -->
+    <button
       v-for="item in items"
       :key="item.id"
+      type="button"
       class="sr-toc__item"
       :class="[item.level === 'h3' ? 'h3' : '', { active: activeId === item.id }]"
-      :href="'#' + item.id"
-      @click.prevent="$emit('toc-click', item)"
+      @click="$emit('toc-click', item)"
     >
       {{ item.text }}
-    </a>
+    </button>
   </nav>
 </template>
 
@@ -48,15 +49,24 @@ defineEmits<{
   margin-bottom: 10px;
 }
 .sr-toc__item {
+  font: inherit;
   font-size: 12px;
   color: var(--text3);
   padding: 3px 0 3px 10px;
-  border-left: 2px solid var(--border);
+  border: 0 solid transparent;
+  border-left-width: 2px;
+  border-left-color: var(--border);
+  background: transparent;
   cursor: pointer;
   transition: all 0.1s;
   display: block;
-  text-decoration: none;
+  width: 100%;
+  text-align: left;
   line-height: 1.5;
+}
+.sr-toc__item:focus-visible {
+  outline: 2px solid var(--primary, #2563eb);
+  outline-offset: 2px;
 }
 .sr-toc__item:hover {
   color: var(--text2);

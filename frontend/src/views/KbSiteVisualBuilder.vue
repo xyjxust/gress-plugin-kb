@@ -77,6 +77,7 @@
           <KbSitePreview
             class="gsb-canvas-preview"
             :site-config="siteRendererConfig"
+            :site-key="siteKey"
             :active-page-id="activePage"
             :active-nav-id="activeNav"
             :show-demo-controls="false"
@@ -630,6 +631,81 @@
             </div>
           </n-tab-pane>
 
+          <n-tab-pane name="extensions" tab="扩展">
+            <div class="vb-modal-scroll rp-scroll">
+              <p class="vb-sidebar-ctx-hint" style="margin-bottom: 10px">
+                扩展 = Plugin（可插拔能力），通过稳定 Slot 注入到页面（登录入口、评论区、广告、埋点等）。
+              </p>
+              <div v-for="ext in availableExtensions" :key="ext.id" class="vb-ext-card">
+                <div class="vb-ext-head">
+                  <div class="vb-ext-title">
+                    <div class="vb-ext-name">{{ ext.name }}</div>
+                    <div v-if="ext.description" class="vb-ext-desc">{{ ext.description }}</div>
+                  </div>
+                  <div class="toggle" :class="{ on: isExtensionEnabled(ext.id) }" @click="toggleExtension(ext.id)" />
+                </div>
+                <div v-if="isExtensionEnabled(ext.id)" class="vb-ext-body">
+                  <component
+                    v-if="resolveExtensionPanel(ext)"
+                    :is="resolveExtensionPanel(ext)"
+                    :options="findExtensionCfg(ext.id)?.options || {}"
+                    @update:options="(v: any) => { const c = ensureExtensionCfg(ext.id); c.options = v || {} }"
+                  />
+
+                  <template v-else v-for="(schema, key) in (ext.optionsSchema || {})" :key="String(key)">
+                    <div class="field">
+                      <div class="fl">{{ schema.label }}</div>
+                      <input
+                        v-if="schema.type === 'string'"
+                        class="fi"
+                        :placeholder="schema.placeholder || ''"
+                        :value="String(getExtensionOption(ext.id, key) ?? '')"
+                        @input="setExtensionOption(ext.id, key, ($event.target as HTMLInputElement).value)"
+                      >
+                      <input
+                        v-else-if="schema.type === 'number'"
+                        class="fi"
+                        type="number"
+                        :value="Number(getExtensionOption(ext.id, key) ?? 0)"
+                        @input="setExtensionOption(ext.id, key, Number(($event.target as HTMLInputElement).value))"
+                      >
+                      <div v-else-if="schema.type === 'boolean'" class="toggle-row">
+                        <span class="fl" style="margin: 0">{{ schema.placeholder || '' }}</span>
+                        <div
+                          class="toggle"
+                          :class="{ on: !!getExtensionOption(ext.id, key) }"
+                          @click="setExtensionOption(ext.id, key, !getExtensionOption(ext.id, key))"
+                        />
+                      </div>
+                      <div v-else-if="schema.type === 'color'" class="color-row">
+                        <div class="swatch" :style="{ background: String(getExtensionOption(ext.id, key) || '#000000') }">
+                          <input
+                            type="color"
+                            :value="String(getExtensionOption(ext.id, key) || '#000000')"
+                            @input="setExtensionOption(ext.id, key, ($event.target as HTMLInputElement).value)"
+                          >
+                        </div>
+                        <input
+                          class="fi fi-mono"
+                          :value="String(getExtensionOption(ext.id, key) ?? '')"
+                          @input="setExtensionOption(ext.id, key, ($event.target as HTMLInputElement).value)"
+                        >
+                      </div>
+                      <select
+                        v-else-if="schema.type === 'select'"
+                        class="fi fi-sel"
+                        :value="String(getExtensionOption(ext.id, key) ?? '')"
+                        @change="setExtensionOption(ext.id, key, ($event.target as HTMLSelectElement).value)"
+                      >
+                        <option v-for="op in schema.options || []" :key="op.value" :value="op.value">{{ op.label }}</option>
+                      </select>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </n-tab-pane>
+
           <n-tab-pane v-if="selectedPage" name="page" tab="当前页面">
             <div class="vb-modal-scroll rp-scroll">
               <div class="field"><div class="fl">标题</div><input v-model="selectedPage.title" class="fi"></div>
@@ -808,7 +884,7 @@
 </template>
 
   <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, toRaw } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch, toRaw, inject } from 'vue'
 import { useDialog } from 'naive-ui'
 import { useMessage, useRoute } from '@keqi.gress/plugin-bridge'
 import { PageHeader } from '@keqi.gress/plugin-ui'
@@ -821,6 +897,10 @@ import type {
   SlotComponentInstance,
   ThemeLayoutId,
 } from '../types/siteRenderer'
+import type { Component } from 'vue'
+import { listExtensions } from '../components/site-renderer/extensions/extensionRegistry'
+import { initBuiltinExtensions } from '../components/site-renderer/extensions/builtinExtensions'
+import { initBuiltinSlotComponents } from '../components/site-renderer/slotRegistry'
 import KbVisualSidebarTreeRows from '../components/site-visual-builder/KbVisualSidebarTreeRows.vue'
 import type { SidebarBuilderNode } from '../components/site-visual-builder/KbVisualSidebarTreeRows.vue'
 import type { KbDoc } from '../types/kb'
@@ -828,10 +908,36 @@ import KbSitePreview from './KbSitePreview.vue'
 import { sidebarTreeMapKeysForLookup } from '../utils/siteRenderer'
 import { kbApi } from '../api/kb'
 import type { KbTreeNode } from '../types/kb'
+import AuthNavbarPanel from '../components/site-renderer/extensions/panels/AuthNavbarPanel.vue'
+import DocCommentsPanel from '../components/site-renderer/extensions/panels/DocCommentsPanel.vue'
 
 const message = useMessage()
 const dialog = useDialog()
 const route = useRoute()
+
+// 确保内置 slots / extensions 已注册（构建器内需要读取 schema 清单）
+initBuiltinSlotComponents()
+initBuiltinExtensions()
+
+// 内置扩展面板：通过 shared registry 暴露给构建器（与 SystemSettings.vue 相同模式）
+;(window as any).__gress_shared_extension_panels__ = (window as any).__gress_shared_extension_panels__ || {}
+
+// 宿主共享组件注册表 getter（与 gress-plugin-codegen/SystemSettings.vue 同款模式）
+const SHARED_GET_REGISTRY_KEY = 'sharedComponentsGetRegistry'
+const sharedGetRegistry = inject<((category: string) => Record<string, Component>) | undefined>(
+  SHARED_GET_REGISTRY_KEY,
+  undefined
+)
+
+// 如果宿主没有提供 shared registry，我们在构建器内提供一个最小 fallback（仅用于内置面板）
+const FALLBACK_PANEL_CATEGORY = 'site-renderer.extension-panel'
+function fallbackGetRegistry(category: string): Record<string, Component> {
+  if (category !== FALLBACK_PANEL_CATEGORY) return {}
+  return {
+    AuthNavbarPanel,
+    DocCommentsPanel,
+  }
+}
 const siteKey = computed(() => {
   const fromParam = route.value.params?.siteKey
   if (typeof fromParam === 'string' && fromParam.trim()) return fromParam.trim()
@@ -846,7 +952,7 @@ function getVisualStorageKey(): string {
   return siteKey.value ? `${VISUAL_BUILDER_STORAGE_KEY}:${siteKey.value}` : VISUAL_BUILDER_STORAGE_KEY
 }
 
-type ConfigModalTab = 'navbar' | 'sidebar' | 'content' | 'footer' | 'theme' | 'slots' | 'page' | 'seo' | 'pages'
+type ConfigModalTab = 'navbar' | 'sidebar' | 'content' | 'footer' | 'theme' | 'slots' | 'extensions' | 'page' | 'seo' | 'pages'
 
 /** 与 gress-site-builder_3.html 一致的清单（slots 与注册表对齐） */
 const THEME_MANIFESTS = [
@@ -954,6 +1060,7 @@ interface BuilderCfg {
   content: { maxWidth: string; showToc: boolean }
   footer: { visible: boolean; copyright: string; links: Array<{ label: string; href?: string }> }
   slots: Record<string, SlotComponentInstance | null | undefined>
+  extensions?: SiteRendererConfig['extensions']
   landingExtras?: SiteRendererConfig['landingConfig']
   /** 每个导航项 id → 独立侧栏菜单树（预览随当前选中导航切换） */
   sidebarTreesByNavId?: Record<string, SidebarTreeData>
@@ -1298,6 +1405,7 @@ const cfg = reactive<BuilderCfg>({
       },
     },
   },
+  extensions: [],
   landingExtras: {
     badgeText: 'v2.0 发布',
     heroTitle: '',
@@ -1990,6 +2098,59 @@ const SLOT_SCHEMAS: Record<string, Record<string, { type: 'string' | 'color' | '
 
 const slotSchemas = SLOT_SCHEMAS
 
+const availableExtensions = computed(() => listExtensions())
+
+function resolveExtensionPanel(ext: any): Component | null {
+  const panel = ext?.configPanel
+  if (!panel) return null
+  const cat = String(panel.category || '').trim()
+  const name = String(panel.name || '').trim()
+  if (!cat || !name) return null
+  const getter = sharedGetRegistry || fallbackGetRegistry
+  return getter?.(cat)?.[name] || null
+}
+
+function findExtensionCfg(id: string): NonNullable<BuilderCfg['extensions']>[number] | null {
+  const exts = cfg.extensions || []
+  return exts.find((e) => e.id === id) || null
+}
+
+function ensureExtensionCfg(id: string) {
+  if (!cfg.extensions) cfg.extensions = []
+  let found = cfg.extensions.find((e) => e.id === id)
+  if (found) return found
+  const def = availableExtensions.value.find((x) => x.id === id)
+  found = { id, enabled: true, order: 0, options: { ...(def?.defaultOptions || {}) } }
+  cfg.extensions.push(found as any)
+  return found
+}
+
+function isExtensionEnabled(id: string): boolean {
+  const c = findExtensionCfg(id)
+  if (!c) return false
+  return c.enabled !== false
+}
+
+function toggleExtension(id: string) {
+  const c = findExtensionCfg(id)
+  if (!c) {
+    ensureExtensionCfg(id)
+    return
+  }
+  c.enabled = c.enabled === false ? true : false
+}
+
+function getExtensionOption(extId: string, key: string): any {
+  const c = findExtensionCfg(extId)
+  return c?.options?.[key]
+}
+
+function setExtensionOption(extId: string, key: string, value: any) {
+  const c = ensureExtensionCfg(extId)
+  if (!c.options) c.options = {}
+  c.options[key] = value
+}
+
 function selectRegion(region: 'navbar' | 'sidebar' | 'content' | 'footer' | 'theme') {
   sel.value = region
   selNavItem.value = null
@@ -2213,6 +2374,7 @@ function applyRendererConfigToBuilder(parsed: SiteRendererConfig) {
   cfg.footer = (parsed.footer as any) || cfg.footer
   cfg.landingExtras = (parsed.landingConfig as any) || cfg.landingExtras
   cfg.slots = (parsed.slots as any) || {}
+  cfg.extensions = (parsed.extensions as any) || []
 
   // 侧栏树：优先恢复 treesByNavId；否则用单 tree
   const map: Record<string, SidebarTreeData> = {}
@@ -2896,21 +3058,17 @@ function buildSiteRendererConfig(): SiteRendererConfig {
     const pickedSeo = pickPageSeoForExport(p)
     const kbDocId = resolveKbDocId(p)
     if (kbDocId !== undefined) {
-      const doc = kbDocByPageId[p.id]
-      const hydrated = Object.prototype.hasOwnProperty.call(kbDocByPageId, p.id)
-      const kbDocLoading = !hydrated || kbDocLoadingByPageId[p.id] === true
       pageMap[p.id] = {
         id: p.id,
         slug: p.slug,
         title: p.title,
         description: fallbackDesc,
         html: undefined,
-        updatedAt: doc?.updatedAt ?? undefined,
         ...(pickedSeo ? { seo: pickedSeo } : {}),
         meta: {
           kbDocListSource: true,
-          kbDoc: doc ?? null,
-          kbDocLoading,
+          // 仅存引用（docId），正文/组件信息运行时按需 getDoc 拉取，避免站点配置 JSON 过大
+          kbDocId,
         },
       }
     } else {
@@ -2938,6 +3096,12 @@ function buildSiteRendererConfig(): SiteRendererConfig {
       fontSans: cfg.theme.font,
     },
     seo: cfg.seo ? { ...toRaw(cfg.seo) } : undefined,
+    extensions: (cfg.extensions || []).map((e) => ({
+      id: String((e as any).id || ''),
+      enabled: (e as any).enabled !== false,
+      order: typeof (e as any).order === 'number' ? (e as any).order : 0,
+      options: (e as any).options || {},
+    })).filter((e) => e.id),
     navbar: {
       brand: cfg.navbar.brand,
       style: cfg.navbar.style,
@@ -3497,5 +3661,33 @@ function applyHist(snap: string) {
 .vb-pi-act .ta:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.vb-ext-card {
+  border: 1px solid var(--bd, #e2e8f0);
+  border-radius: 10px;
+  background: var(--surface, #fff);
+  padding: 12px 12px 10px;
+  margin-bottom: 10px;
+}
+.vb-ext-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.vb-ext-name {
+  font-weight: 600;
+  color: var(--tx, #0f172a);
+}
+.vb-ext-desc {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--tx2, #64748b);
+}
+.vb-ext-body {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--bd, #e2e8f0);
 }
 </style>

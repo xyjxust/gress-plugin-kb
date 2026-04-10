@@ -1,11 +1,18 @@
 import KbDocList from './views/KbDocList.vue'
 import KbDocEditor from './views/KbDocEditor.vue'
 import KbDocPreview from './views/KbDocPreview.vue'
+import KbDocComponentEditor from './views/KbDocComponentEditor.vue'
 import KbSiteManage from './views/KbSiteManage.vue'
 import KbSiteWorkspaceManage from './views/KbSiteWorkspaceManage.vue'
 import KbSiteConfigManage from './views/KbSiteConfigManage.vue'
 import KbSitePreview from './views/KbSitePreview.vue'
 import KbSiteVisualBuilder from './views/KbSiteVisualBuilder.vue'
+
+// Demo: third-party extension + shared config panel (for测绘)
+import { registerHelloWorldThirdPartyExtension } from './components/site-renderer/extensions/examples/ThirdPartyHelloExtension'
+import HelloWorldThirdPartyPanel from './components/site-renderer/extensions/examples/HelloWorldThirdPartyPanel.vue'
+import KbDocListPage from './views/KbDocList.vue'
+import KbStartPage from './views/KbStartPage.vue'
 
 export interface KbFrontendConfig {
   siteName?: string
@@ -18,6 +25,9 @@ const defaults: Required<KbFrontendConfig> = {
 /** 宿主菜单 plugin-ui.yml 中 component: KnowledgeBase 时仍指向列表页 */
 export default (bridge: any, properties?: KbFrontendConfig) => {
   const config = { ...defaults, ...(properties || {}) }
+
+  // Register demo extension at runtime (simulating "other plugin")
+  // registerHelloWorldThirdPartyExtension()
 
   return {
     id: 'kb',
@@ -69,10 +79,22 @@ export default (bridge: any, properties?: KbFrontendConfig) => {
           meta: { title: '编辑文档', pluginId: 'kb' }
         },
         {
+          path: '/plugins/kb/docs/component/:docId',
+          name: 'kb-doc-component-edit',
+          component: KbDocComponentEditor,
+          meta: { title: '组件文档', pluginId: 'kb' }
+        },
+        {
           path: '/plugins/kb/docs/:siteKey/edit/:docId',
           name: 'kb-doc-edit-by-site',
           component: KbDocEditor,
           meta: { title: '编辑文档', pluginId: 'kb' }
+        },
+        {
+          path: '/plugins/kb/docs/:siteKey/component/:docId',
+          name: 'kb-doc-component-edit-by-site',
+          component: KbDocComponentEditor,
+          meta: { title: '组件文档', pluginId: 'kb' }
         },
         {
           path: '/plugins/kb/docs/preview/:docId',
@@ -117,7 +139,28 @@ export default (bridge: any, properties?: KbFrontendConfig) => {
           meta: { title: '站点可视化构建器', pluginId: 'kb' }
         }
       ],
-      components: [],
+      // Share extension config panel component to host registry (category + name)
+      components: [
+        {
+          global: true,
+          category: 'site-renderer.extension-panel',
+          name: 'HelloWorldThirdPartyPanel',
+          component: HelloWorldThirdPartyPanel,
+        },
+        // Demo: share a "page component" so a site page can render complex UI
+        {
+          global: true,
+          category: 'site-renderer.page',
+          name: 'KbDocListPage',
+          component: KbDocListPage,
+        },
+        {
+          global: true,
+          category: 'site-renderer.page',
+          name: 'KbStartPage',
+          component: KbStartPage,
+        },
+      ],
       menus: [],
       widgets: []
     },

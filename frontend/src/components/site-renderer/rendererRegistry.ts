@@ -45,7 +45,7 @@ const BUILTIN_MANIFESTS: ThemeManifest[] = [
     name: '文档站',
     icon: '📄',
     regions: ['navbar', 'sidebar', 'content', 'toc', 'footer'],
-    slots: ['sidebar-top', 'content-top'],
+    slots: ['sidebar-top', 'content-top', 'navbar-trailing', 'content-bottom'],
     defaultPageId: 'getting-started',
   },
   {
@@ -53,7 +53,7 @@ const BUILTIN_MANIFESTS: ThemeManifest[] = [
     name: '博客',
     icon: '✍️',
     regions: ['navbar', 'content', 'footer'],
-    slots: ['content-top'],
+    slots: ['content-top', 'navbar-trailing', 'content-bottom'],
     defaultPageId: 'home',
   },
   {
@@ -61,7 +61,7 @@ const BUILTIN_MANIFESTS: ThemeManifest[] = [
     name: '落地页',
     icon: '🚀',
     regions: ['navbar', 'hero', 'features', 'footer'],
-    slots: ['content-top'],
+    slots: ['content-top', 'navbar-trailing', 'content-bottom'],
     defaultPageId: 'home',
   },
 ]

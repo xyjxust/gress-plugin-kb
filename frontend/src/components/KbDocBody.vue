@@ -23,6 +23,7 @@ import { parseKbMarkdown } from '../editor/kbMarked'
 import { rewriteHtmlStorageUrlsToDownloadApi } from '../utils/kbStorageDownload'
 import { enhanceKbDocCodeBlocks, enhanceKbTabbedPanels } from '../utils/kbDocCodeBlocks'
 import { ensureDocLinksOpenInNewTab } from '../utils/kbDocProseLinks'
+import { injectHeadingIdsIntoHtml } from '../utils/kbHeadingAnchors'
 import 'highlight.js/styles/github.css'
 
 const message = useMessage()
@@ -98,6 +99,7 @@ const html = computed(() => {
     inner = rewriteHtmlStorageUrlsToDownloadApi(inner)
   }
   inner = enhanceKbTabbedPanels(enhanceKbDocCodeBlocks(inner))
+  inner = injectHeadingIdsIntoHtml(inner)
   return ensureDocLinksOpenInNewTab(inner)
 })
 </script>

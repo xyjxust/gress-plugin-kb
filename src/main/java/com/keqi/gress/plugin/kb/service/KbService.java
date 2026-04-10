@@ -79,6 +79,7 @@ public class KbService {
             n.setTitle(d.getTitle());
             n.setSlug(d.getSlug());
             n.setStatus(d.getStatus());
+            n.setDocType(d.getDocType());
             map.put(n.getId(), n);
         }
         List<KbTreeNodeDTO> roots = new ArrayList<>();
@@ -117,6 +118,12 @@ public class KbService {
         doc.setParentId(req.getParentId());
         doc.setSlug(slug);
         doc.setTitle(req.getTitle().trim());
+        String dt = (req.getDocType() == null || req.getDocType().isBlank()) ? "EDITOR" : req.getDocType().trim().toUpperCase();
+        if (!dt.equals("EDITOR") && !dt.equals("COMPONENT")) dt = "EDITOR";
+        doc.setDocType(dt);
+        doc.setComponentCategory(req.getComponentCategory());
+        doc.setComponentName(req.getComponentName());
+        doc.setComponentPropsJson(req.getComponentPropsJson());
         doc.setBodyMd(req.getBodyMd() == null ? "" : req.getBodyMd());
         doc.setBodyHtml(null);
         doc.setStaticHtmlUrl(null);
@@ -156,6 +163,13 @@ public class KbService {
         if (req.getBodyMd() != null) {
             doc.setBodyMd(req.getBodyMd());
         }
+        if (req.getDocType() != null && !req.getDocType().isBlank()) {
+            String dt = req.getDocType().trim().toUpperCase();
+            if (dt.equals("EDITOR") || dt.equals("COMPONENT")) doc.setDocType(dt);
+        }
+        if (req.getComponentCategory() != null) doc.setComponentCategory(req.getComponentCategory());
+        if (req.getComponentName() != null) doc.setComponentName(req.getComponentName());
+        if (req.getComponentPropsJson() != null) doc.setComponentPropsJson(req.getComponentPropsJson());
         doc.setVersion((doc.getVersion() == null ? 1 : doc.getVersion()) + 1);
         docDao.updateById(doc);
         return Result.success(toDto(doc));
@@ -169,6 +183,14 @@ public class KbService {
         if (!Objects.equals(doc.getSpaceId(), ensureSpace(siteKey))) {
             return Result.error("文档不属于当前站点");
         }
+        // COMPONENT 类型：不生成静态 HTML，仅标记发布（渲染时由组件驱动）
+        if ("COMPONENT".equalsIgnoreCase(doc.getDocType())) {
+            doc.setStatus("PUBLISHED");
+            doc.setPublishedAt(LocalDateTime.now());
+            docDao.updateById(doc);
+            return Result.success(toDto(doc));
+        }
+
         String oldStaticUrl = doc.getStaticHtmlUrl();
         int nextStaticVersion = (doc.getStaticVersion() == null ? 0 : doc.getStaticVersion()) + 1;
         String bodyHtml = renderAndSanitizeHtml(doc.getBodyMd());
@@ -695,6 +717,10 @@ public class KbService {
         dto.setParentId(doc.getParentId());
         dto.setSlug(doc.getSlug());
         dto.setTitle(doc.getTitle());
+        dto.setDocType(doc.getDocType());
+        dto.setComponentCategory(doc.getComponentCategory());
+        dto.setComponentName(doc.getComponentName());
+        dto.setComponentPropsJson(doc.getComponentPropsJson());
         dto.setBodyMd(doc.getBodyMd());
         dto.setBodyHtml(doc.getBodyHtml());
         dto.setStatus(doc.getStatus());

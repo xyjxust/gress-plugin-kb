@@ -42,6 +42,8 @@ import { computed, ref, onBeforeMount, onMounted, onUnmounted } from 'vue'
 import type { SiteRendererConfig } from '../../types/siteRenderer'
 import { buildRendererCssVars, pickSidebarTreeForActiveNav } from '../../utils/siteRenderer'
 import { getRendererTheme, initBuiltinThemes, hasRendererTheme } from './rendererRegistry'
+import { initBuiltinSlotComponents } from './slotRegistry'
+import { initBuiltinExtensions } from './extensions/builtinExtensions'
 import KbSiteSearchModal from './KbSiteSearchModal.vue'
 
 const props = withDefaults(
@@ -75,6 +77,8 @@ onBeforeMount(() => {
   if (!hasRendererTheme('docs')) {
     initBuiltinThemes()
   }
+  initBuiltinSlotComponents()
+  initBuiltinExtensions()
 })
 
 function openSiteSearch() {

@@ -31,7 +31,8 @@ public class KbDocDao {
                         KbDoc::getParentId,
                         KbDoc::getSlug,
                         KbDoc::getTitle,
-                        KbDoc::getStatus)
+                        KbDoc::getStatus,
+                        KbDoc::getDocType)
                 .eq(KbDoc::getSpaceId, spaceId)
                 .orderByAsc(KbDoc::getId)
                 .list();

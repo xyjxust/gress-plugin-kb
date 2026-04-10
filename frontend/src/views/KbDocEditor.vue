@@ -1084,8 +1084,7 @@ const editor = useEditor({
   onCreate: ({ editor: ed }) => {
     outline.value = outlineFromEditor(ed)
     editorLayoutTick.value++
-    // 默认聚焦到编辑区（仅首次创建时）
-    nextTick(() => ed.commands.focus('start'))
+    // 不在此强制 focus：已有文档由 loadDoc 注入内容后按是否为空再决定是否聚焦，避免抢标题等焦点
   }
 })
 
@@ -1940,6 +1939,13 @@ const currentEditingDocIdNumber = computed<number | null>(() => {
   return id
 })
 
+/** 仅当编辑区仍为空时再聚焦到开头，已有内容时不抢光标（便于先改标题等） */
+function focusEditorStartIfEmpty() {
+  const ed = editor.value
+  if (!ed?.isEmpty) return
+  ed.commands.focus('start')
+}
+
 async function loadDocIntoEditorById(id: number) {
   if (!id || Number.isNaN(id)) return
   docContentLoading.value = true
@@ -1954,7 +1960,7 @@ async function loadDocIntoEditorById(id: number) {
     editor.value?.commands.setContent(html, { emitUpdate: false })
     if (editor.value) outline.value = outlineFromEditor(editor.value)
     nextTick(() => {
-      editor.value?.commands.focus('start')
+      focusEditorStartIfEmpty()
       refreshBaselineFromCurrent()
     })
   } catch (e: any) {
@@ -2499,7 +2505,7 @@ async function loadDoc() {
       editor.value?.commands.setContent('<p></p>', { emitUpdate: false })
       if (editor.value) outline.value = outlineFromEditor(editor.value)
       nextTick(() => {
-        editor.value?.commands.focus('start')
+        focusEditorStartIfEmpty()
         refreshBaselineFromCurrent()
       })
     } finally {
@@ -2526,7 +2532,7 @@ async function loadDoc() {
     editor.value?.commands.setContent(html, { emitUpdate: false })
     if (editor.value) outline.value = outlineFromEditor(editor.value)
     nextTick(() => {
-      editor.value?.commands.focus('start')
+      focusEditorStartIfEmpty()
       refreshBaselineFromCurrent()
     })
   } catch (e: any) {

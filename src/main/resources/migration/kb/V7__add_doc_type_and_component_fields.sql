@@ -1,0 +1,6 @@
+ALTER TABLE kb_doc
+  ADD COLUMN IF NOT EXISTS doc_type VARCHAR(32) NOT NULL DEFAULT 'EDITOR' AFTER title,
+  ADD COLUMN IF NOT EXISTS component_category VARCHAR(128) NULL AFTER doc_type,
+  ADD COLUMN IF NOT EXISTS component_name VARCHAR(128) NULL AFTER component_category,
+  ADD COLUMN IF NOT EXISTS component_props_json MEDIUMTEXT NULL AFTER component_name;
+

@@ -7,14 +7,30 @@
       :active-nav-id="activeNavId"
       @nav-click="(item) => $emit('nav-click', item)"
       @search="$emit('search')"
-    />
+    >
+      <template #trailing>
+        <KbRendererSlotOutlet
+          v-if="hasNavbarTrailing && slotVisible['navbar-trailing'] !== false"
+          :config="config"
+          slot-key="navbar-trailing"
+          :active-page-id="activePageId"
+          :active-nav-id="activeNavId"
+          :page="currentPage"
+          @close="slotVisible['navbar-trailing'] = false"
+        />
+      </template>
+    </KbRendererNavbar>
 
     <!-- content-top 插槽 -->
-    <div
-      v-if="contentTopSlot && slotVisible['content-top'] !== false"
-      class="sr-landing-slot-top"
-    >
-      <KbRendererSlot :instance="contentTopSlot" @close="slotVisible['content-top'] = false" />
+    <div v-if="hasContentTop && slotVisible['content-top'] !== false" class="sr-landing-slot-top">
+      <KbRendererSlotOutlet
+        :config="config"
+        slot-key="content-top"
+        :active-page-id="activePageId"
+        :active-nav-id="activeNavId"
+        :page="currentPage"
+        @close="slotVisible['content-top'] = false"
+      />
     </div>
 
     <!-- Hero -->
@@ -34,6 +50,17 @@
       :features="landing?.features || defaultFeatures"
     />
 
+    <div v-if="hasContentBottom && slotVisible['content-bottom'] !== false" class="sr-landing-slot-bottom">
+      <KbRendererSlotOutlet
+        :config="config"
+        slot-key="content-bottom"
+        :active-page-id="activePageId"
+        :active-nav-id="activeNavId"
+        :page="currentPage"
+        @close="slotVisible['content-bottom'] = false"
+      />
+    </div>
+
     <!-- Footer -->
     <KbRendererFooter :config="config.footer" />
   </div>
@@ -46,7 +73,7 @@ import KbRendererNavbar from '../regions/KbRendererNavbar.vue'
 import KbRendererHero from '../regions/KbRendererHero.vue'
 import KbRendererFeatures from '../regions/KbRendererFeatures.vue'
 import KbRendererFooter from '../regions/KbRendererFooter.vue'
-import KbRendererSlot from '../KbRendererSlot.vue'
+import KbRendererSlotOutlet from '../KbRendererSlotOutlet.vue'
 
 const props = defineProps<{
   config: SiteRendererConfig
@@ -64,7 +91,9 @@ const slotVisible = reactive<Record<string, boolean>>({})
 
 const currentPage = computed(() => props.config.pages[props.activePageId] || null)
 const landing = computed(() => props.config.landingConfig)
-const contentTopSlot = computed(() => props.config.slots['content-top'] || null)
+const hasContentTop = computed(() => (props.config.slots as any)['content-top'] != null || !!props.config.extensions?.length)
+const hasContentBottom = computed(() => (props.config.slots as any)['content-bottom'] != null || !!props.config.extensions?.length)
+const hasNavbarTrailing = computed(() => (props.config.slots as any)['navbar-trailing'] != null || !!props.config.extensions?.length)
 
 const heroTitle = computed(
   () => landing.value?.heroTitle || currentPage.value?.title || 'Welcome'
@@ -94,5 +123,10 @@ const defaultFeatures: FeatureItem[] = [
 }
 .sr-landing-slot-top {
   border-bottom: 1px solid var(--border);
+}
+.sr-landing-slot-bottom {
+  max-width: 980px;
+  margin: 28px auto 0;
+  padding: 0 24px;
 }
 </style>

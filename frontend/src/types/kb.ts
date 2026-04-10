@@ -4,6 +4,7 @@ export interface KbTreeNode {
   title: string
   slug: string
   status: 'DRAFT' | 'PUBLISHED' | string
+  docType?: 'EDITOR' | 'COMPONENT' | string
   children: KbTreeNode[]
 }
 
@@ -13,6 +14,11 @@ export interface KbDoc {
   parentId: number | null
   slug: string
   title: string
+  /** EDITOR / COMPONENT */
+  docType?: 'EDITOR' | 'COMPONENT' | string
+  componentCategory?: string | null
+  componentName?: string | null
+  componentPropsJson?: string | null
   bodyMd: string
   bodyHtml?: string | null
   status: 'DRAFT' | 'PUBLISHED' | string
@@ -46,6 +52,11 @@ export interface UpsertKbDocRequest {
   slug?: string
   title?: string
   bodyMd?: string
+  /** EDITOR / COMPONENT */
+  docType?: 'EDITOR' | 'COMPONENT' | string
+  componentCategory?: string
+  componentName?: string
+  componentPropsJson?: string
 }
 
 export type KbNavNodeType = 'GROUP' | 'DOC' | 'LINK' | string

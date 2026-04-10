@@ -192,7 +192,27 @@ export interface SlotComponentInstance {
   instanceId: string
   componentKey: string
   visible?: boolean
+  /** 排序（越小越靠前），用于同一 slot 渲染多实例 */
+  order?: number
   props: Record<string, any>
+}
+
+/* ── 扩展（Plugin）配置：Schema 驱动 ─────────────────────────── */
+export type ExtensionSchemaFieldType = 'string' | 'number' | 'boolean' | 'color' | 'select'
+
+export interface ExtensionSchemaField {
+  type: ExtensionSchemaFieldType
+  label: string
+  placeholder?: string
+  /** 仅 select 类型使用 */
+  options?: Array<{ label: string; value: string }>
+}
+
+export interface SiteExtensionConfig {
+  id: string
+  enabled?: boolean
+  order?: number
+  options?: Record<string, any>
 }
 
 /* ── 页面数据 ──────────────────────────────────────────────────── */
@@ -241,7 +261,17 @@ export interface SiteRendererConfig {
   content: ContentConfig
   footer: FooterConfig
   landingConfig?: LandingConfig
-  slots: Record<string, SlotComponentInstance>
+  /**
+   * Slot 层：布局/区域暴露的稳定插槽位。
+   * - 兼容旧数据：值允许是单个 SlotComponentInstance
+   * - 新数据：推荐使用数组，以支持同一 slot 渲染多个实例 + 排序
+   */
+  slots: Record<string, SlotComponentInstance | SlotComponentInstance[]>
+  /**
+   * Plugin 层：可插拔扩展（登录、评论、广告、埋点等）。
+   * 仅保存“启用 + options”，具体注入由运行时 registry 决定。
+   */
+  extensions?: SiteExtensionConfig[]
   pages: Record<string, PageData>
 }
 

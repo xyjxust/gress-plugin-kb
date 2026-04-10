@@ -12,6 +12,8 @@ public class KbTreeNodeDTO {
     private String title;
     private String slug;
     private String status;
+    /** EDITOR / COMPONENT */
+    private String docType;
     private List<KbTreeNodeDTO> children = new ArrayList<>();
 }
 

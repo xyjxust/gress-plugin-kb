@@ -11,6 +11,10 @@ public class KbDocDTO {
     private Long parentId;
     private String slug;
     private String title;
+    private String docType; // EDITOR / COMPONENT
+    private String componentCategory;
+    private String componentName;
+    private String componentPropsJson;
     private String bodyMd;
     private String bodyHtml;
     private String status;

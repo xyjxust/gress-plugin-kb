@@ -1,4 +1,8 @@
 import { markRaw, type Component } from 'vue'
+import KbSlotAdBanner from './slot-components/KbSlotAdBanner.vue'
+import KbSlotAnnouncement from './slot-components/KbSlotAnnouncement.vue'
+import KbSlotAuthEntry from './slot-components/KbSlotAuthEntry.vue'
+import KbSlotComments from './slot-components/KbSlotComments.vue'
 
 /* ── 插槽组件查找表 ────────────────────────────────────────────── */
 const SLOT_COMPONENT_MAP: Record<string, Component> = {}
@@ -21,11 +25,8 @@ export function getSlotComponent(key: string): Component | undefined {
  * 初始化内置插槽组件
  */
 export function initBuiltinSlotComponents(): void {
-  // 延迟导入避免循环依赖
-  import('./slot-components/KbSlotAdBanner.vue').then((m) => {
-    registerSlotComponent('AdBanner', m.default)
-  })
-  import('./slot-components/KbSlotAnnouncement.vue').then((m) => {
-    registerSlotComponent('Announcement', m.default)
-  })
+  registerSlotComponent('AdBanner', KbSlotAdBanner)
+  registerSlotComponent('Announcement', KbSlotAnnouncement)
+  registerSlotComponent('AuthEntry', KbSlotAuthEntry)
+  registerSlotComponent('Comments', KbSlotComments)
 }

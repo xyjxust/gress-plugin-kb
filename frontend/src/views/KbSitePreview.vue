@@ -17,6 +17,7 @@
       @brand-click="onBrandClick"
       @page-select="onPageSelect"
       @nav-click="onNavClick"
+      @toc-click="onTocClick"
       @sidebar-unbound-click="onSidebarUnboundClick"
     />
 
@@ -29,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef, watch } from 'vue'
 import type { SiteRendererConfig, ThemeLayoutId } from '../types/siteRenderer'
 import {
   COLOR_PRESETS,
@@ -43,6 +44,8 @@ import KbSiteRenderer from '../components/site-renderer/KbSiteRenderer.vue'
 import { kbApi } from '../api/kb'
 import type { KbDoc, KbNavNode, KbSite } from '../types/kb'
 import { markdownToHtml } from '../editor/mdHtml'
+import { injectHeadingIdsIntoHtml } from '../utils/kbHeadingAnchors'
+import { enhanceKbDocCodeBlocks, enhanceKbTabbedPanels } from '../utils/kbDocCodeBlocks'
 
 const UNBOUND_PAGE_ID = 'kb-unbound'
 
@@ -50,6 +53,8 @@ const props = withDefaults(
   defineProps<{
     /** 传入时与内部演示数据解耦，用于站点构建器嵌入同一渲染数据模型 */
     siteConfig?: SiteRendererConfig
+    /** 构建器模式下用于拉取 kb 文档（否则将无法 hydrate 文档内容） */
+    siteKey?: string
     activePageId?: string | null
     activeNavId?: string | null
     /** 为 false 时隐藏右下角演示面板（构建器画布内） */
@@ -57,6 +62,7 @@ const props = withDefaults(
   }>(),
   {
     siteConfig: undefined,
+    siteKey: undefined,
     activePageId: null,
     activeNavId: null,
     showDemoControls: true,
@@ -284,6 +290,7 @@ const internalActiveNav = ref('docs')
 /* ── KB 真实站点预览（独立预览路由：未传入 siteConfig 时启用） ───────── */
 const resolvedSite = ref<KbSite | null>(null)
 const resolvedSiteKey = computed(() => resolvedSite.value?.spaceKey || '')
+const effectiveSiteKey = computed(() => resolvedSiteKey.value || String(props.siteKey || '').trim())
 const kbLoading = ref(false)
 const accessBlocked = ref(false)
 const sidebarHint = reactive({ show: false, text: '' })
@@ -305,7 +312,7 @@ function detectDarkUi() {
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
 }
 
-type KbPageMeta = { kbDocId?: number; kbDocLoading?: boolean }
+type KbPageMeta = { kbDocId?: number; kbDocLoading?: boolean; kbDocListSource?: boolean; kbDoc?: any }
 const kbDocIdByPageId = reactive<Record<string, number>>({})
 const kbSiteConfig = reactive<SiteRendererConfig>({
   themeId: 'docs',
@@ -341,6 +348,28 @@ const kbSiteConfig = reactive<SiteRendererConfig>({
   slots: {},
   pages: {},
 })
+
+// 构建器预览：props.siteConfig 可能是 computed 的只读引用，这里克隆一份用于 runtime hydration（kbDoc、toc 等）
+const builderConfig = shallowRef<SiteRendererConfig | null>(null)
+watch(
+  () => props.siteConfig,
+  (cfg) => {
+    if (!cfg) {
+      builderConfig.value = null
+      return
+    }
+    try {
+      builderConfig.value = structuredClone(cfg)
+    } catch {
+      builderConfig.value = JSON.parse(JSON.stringify(cfg)) as SiteRendererConfig
+    }
+  },
+  { immediate: true, deep: true }
+)
+
+function getHydrateConfig(): SiteRendererConfig {
+  return props.siteConfig ? (builderConfig.value || (props.siteConfig as SiteRendererConfig)) : kbSiteConfig
+}
 
 function resolveCurrentPath(): string {
   if (typeof window === 'undefined') return '/'
@@ -399,26 +428,48 @@ function ensureKbPage(docId: number, title?: string) {
 }
 
 async function hydratePageDoc(pageId: string) {
-  const docId = kbDocIdByPageId[pageId]
+  const cfg = getHydrateConfig()
+  const pages = (cfg.pages || {}) as any
+  const p = pages[pageId] as any
+  if (!p) return
+  const meta = (p.meta || {}) as any
+  const docId = kbDocIdByPageId[pageId] || meta.kbDocId
   if (!docId) return
-  const p = kbSiteConfig.pages[pageId]
-  const meta = (p.meta || {}) as KbPageMeta
+  // 回填映射，兼容“发布 JSON 直接带 pages”场景
+  kbDocIdByPageId[pageId] = docId
   if (meta.kbDocLoading) return
-  if (p.html && p.html.trim()) return
+  if (meta.kbDoc) return
   meta.kbDocLoading = true
   p.meta = meta
   try {
-    const d: KbDoc = await kbApi.getDoc(docId, resolvedSiteKey.value || undefined)
+    const d: KbDoc = await kbApi.getDoc(docId, effectiveSiteKey.value || undefined)
     p.title = d.title || p.title
     p.updatedAt = d.updatedAt || p.updatedAt
-    p.html = markdownToHtml(d.bodyMd || '')
-    p.toc = tocFromHtml(p.html || '')
+    const dt = String((d as any).docType || 'EDITOR').toUpperCase()
+    if (dt === 'COMPONENT') {
+      // 组件文档：渲染由 KbRendererContent 从 meta.kbDoc 派生
+      p.html = ''
+      p.toc = []
+      p.meta = { ...(p.meta as any), kbDocListSource: true, kbDoc: d } as any
+    } else {
+      // 编辑器文档：用 KbDocBody 渲染正文；TOC 必须与 KbDocBody 最终 v-html 的标题 id 一致
+      let inner =
+        d.status === 'PUBLISHED' && (d as any).bodyHtml
+          ? String((d as any).bodyHtml)
+          : markdownToHtml(d.bodyMd || '')
+      inner = enhanceKbTabbedPanels(enhanceKbDocCodeBlocks(inner))
+      inner = injectHeadingIdsIntoHtml(inner)
+      p.html = '' // 避免重复存 html（KbDocBody 自己渲染）
+      p.toc = tocFromHtml(inner || '')
+      p.meta = { ...(p.meta as any), kbDocListSource: true, kbDoc: d } as any
+    }
   } catch {
     p.html = `<div style="padding:16px;color:#64748b">文档加载失败（docId=${docId}）</div>`
     p.toc = []
   } finally {
-    meta.kbDocLoading = false
-    p.meta = meta
+    const cur = (p.meta || {}) as any
+    cur.kbDocLoading = false
+    p.meta = cur
   }
 }
 
@@ -668,7 +719,7 @@ onBeforeUnmount(() => {
 })
 
 const effectiveSiteConfig = computed(() => {
-  const base = props.siteConfig ? props.siteConfig : resolvedSite.value ? kbSiteConfig : demoSiteConfig
+  const base = props.siteConfig ? (builderConfig.value || props.siteConfig) : resolvedSite.value ? kbSiteConfig : demoSiteConfig
   const pages = (base.pages || {}) as any
   if (Object.prototype.hasOwnProperty.call(pages, UNBOUND_PAGE_ID)) return base
   // 注入一个占位页：用于「未绑定侧栏叶子」时切换到一个可渲染的页面
@@ -734,6 +785,18 @@ const effectiveActiveNav = computed(() =>
   props.activeNavId != null && props.activeNavId !== '' ? props.activeNavId : internalActiveNav.value
 )
 
+// 构建器预览：activePage 初始化/切换时也需要 hydrate 文档内容（meta 里通常只有 kbDocId）
+watch(
+  () => [props.siteConfig, effectiveActivePage.value, effectiveSiteKey.value] as const,
+  ([cfg, pageId, sk]) => {
+    if (!cfg) return
+    if (!sk) return
+    if (!pageId || pageId === UNBOUND_PAGE_ID) return
+    void hydratePageDoc(String(pageId))
+  },
+  { immediate: true }
+)
+
 const themes = getBuiltinManifests()
 const colorPresets = COLOR_PRESETS
 
@@ -797,7 +860,7 @@ function onPageSelect(id: string) {
   if (props.activePageId == null) internalActivePage.value = id
   emit('update:activePageId', id)
   if (resolvedSite.value) syncActiveNavForPage(id)
-  if (resolvedSite.value) void hydratePageDoc(id)
+  if (resolvedSite.value || props.siteConfig) void hydratePageDoc(id)
   if (resolvedSite.value) updateUrlForPage(id)
 }
 
@@ -808,7 +871,7 @@ function onNavClick(item: any) {
   if (pid) {
     if (props.activePageId == null) internalActivePage.value = pid
     emit('update:activePageId', pid)
-    if (resolvedSite.value) void hydratePageDoc(pid)
+    if (resolvedSite.value || props.siteConfig) void hydratePageDoc(pid)
     if (resolvedSite.value) updateUrlForPage(pid)
     return
   }
@@ -821,7 +884,7 @@ function onNavClick(item: any) {
     if (first) {
       if (props.activePageId == null) internalActivePage.value = first
       emit('update:activePageId', first)
-      if (resolvedSite.value) void hydratePageDoc(first)
+      if (resolvedSite.value || props.siteConfig) void hydratePageDoc(first)
       if (resolvedSite.value) updateUrlForPage(first)
       return
     }
@@ -864,6 +927,57 @@ function onSidebarUnboundClick(label: string) {
 
   // 切换到占位页，让内容区有明确的“无内容”落点，而不是停留在上一个页面
   onPageSelect(UNBOUND_PAGE_ID)
+}
+
+function scrollToAnchor(id: string) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return
+  const safeId = String(id || '').trim().replace(/^#/, '')
+  if (!safeId) return
+
+  // 标题一般在正文区域（docs 主题为滚动容器 .sr-docs-content-scroll）
+  const root = document.querySelector('.sr-preview-renderer') as HTMLElement | null
+  const container =
+    (root?.querySelector('.sr-docs-content-scroll') as HTMLElement | null) ||
+    (document.scrollingElement as HTMLElement | null) ||
+    (document.documentElement as HTMLElement)
+
+  const target =
+    (root?.querySelector(`#${CSS.escape(safeId)}`) as HTMLElement | null) ||
+    (document.getElementById(safeId) as HTMLElement | null)
+  if (!target) return
+
+  // 计算目标相对滚动容器的 top，再减去 navbar 高度
+  const navbarH = Number(getComputedStyle(document.documentElement).getPropertyValue('--navbar-h').replace('px', '')) || 60
+  const cRect = container.getBoundingClientRect()
+  const tRect = target.getBoundingClientRect()
+  const delta = tRect.top - cRect.top
+  const top = Math.max(0, container.scrollTop + delta - navbarH - 16)
+
+  container.scrollTo({ top, behavior: 'smooth' })
+
+  // 与 Vue hash 路由兼容：不能把 location.hash 设成「#标题」，否则会冲掉 #/sites?p=... 等父路由。
+  // 在「#」后的路径段上追加查询参数 h=锚点 id，便于复制链接且不丢当前页。
+  try {
+    const raw = window.location.hash
+    if (raw.startsWith('#/')) {
+      const inner = raw.slice(1)
+      const q = inner.indexOf('?')
+      const path = q >= 0 ? inner.slice(0, q) : inner
+      const search = q >= 0 ? inner.slice(q + 1) : ''
+      const params = new URLSearchParams(search)
+      params.set('h', safeId)
+      const nextHash = `#${path}?${params.toString()}`
+      history.replaceState(null, '', `${window.location.pathname}${window.location.search}${nextHash}`)
+    }
+  } catch {
+    // ignore
+  }
+}
+
+function onTocClick(item: any) {
+  const id = String(item?.id || '').trim()
+  if (!id) return
+  scrollToAnchor(id)
 }
 
 function refreshPage() {

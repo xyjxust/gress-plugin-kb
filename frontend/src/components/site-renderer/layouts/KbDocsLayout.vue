@@ -19,6 +19,15 @@
         >
           {{ sidebarOpen ? '◧' : '▣' }}
         </button>
+        <KbRendererSlotOutlet
+          v-if="hasNavbarTrailing && slotVisible['navbar-trailing'] !== false"
+          :config="config"
+          slot-key="navbar-trailing"
+          :active-page-id="activePageId"
+          :active-nav-id="activeNavId"
+          :page="currentPage"
+          @close="slotVisible['navbar-trailing'] = false"
+        />
       </template>
     </KbRendererNavbar>
 
@@ -95,9 +104,13 @@
           @unbound-click="(label) => emit('sidebar-unbound-click', label)"
         >
           <template #sidebar-top>
-            <KbRendererSlot
-              v-if="sidebarTopSlot && slotVisible['sidebar-top'] !== false"
-              :instance="sidebarTopSlot"
+            <KbRendererSlotOutlet
+              v-if="hasSidebarTop && slotVisible['sidebar-top'] !== false"
+              :config="config"
+              slot-key="sidebar-top"
+              :active-page-id="activePageId"
+              :active-nav-id="activeNavId"
+              :page="currentPage"
               @close="slotVisible['sidebar-top'] = false"
             />
           </template>
@@ -127,9 +140,13 @@
           @unbound-click="(label) => $emit('sidebar-unbound-click', label)"
         >
           <template #sidebar-top>
-            <KbRendererSlot
-              v-if="sidebarTopSlot && slotVisible['sidebar-top'] !== false"
-              :instance="sidebarTopSlot"
+            <KbRendererSlotOutlet
+              v-if="hasSidebarTop && slotVisible['sidebar-top'] !== false"
+              :config="config"
+              slot-key="sidebar-top"
+              :active-page-id="activePageId"
+              :active-nav-id="activeNavId"
+              :page="currentPage"
               @close="slotVisible['sidebar-top'] = false"
             />
           </template>
@@ -140,10 +157,17 @@
       <main class="sr-docs-content">
         <!-- content-top 插槽 -->
         <div
-          v-if="contentTopSlot && slotVisible['content-top'] !== false"
+          v-if="hasContentTop && slotVisible['content-top'] !== false"
           class="sr-docs-content-slot-top"
         >
-          <KbRendererSlot :instance="contentTopSlot" @close="slotVisible['content-top'] = false" />
+          <KbRendererSlotOutlet
+            :config="config"
+            slot-key="content-top"
+            :active-page-id="activePageId"
+            :active-nav-id="activeNavId"
+            :page="currentPage"
+            @close="slotVisible['content-top'] = false"
+          />
         </div>
 
         <div class="sr-docs-content-scroll">
@@ -154,7 +178,21 @@
                 :class="{ wide: config.content.maxWidth === '100%' }"
                 :key="activePageId"
               >
-                <KbRendererContent :page="currentPage" />
+                <KbRendererContent :page="currentPage" :config="config" />
+
+                <div
+                  v-if="hasContentBottom && slotVisible['content-bottom'] !== false"
+                  class="sr-docs-content-slot-bottom"
+                >
+                  <KbRendererSlotOutlet
+                    :config="config"
+                    slot-key="content-bottom"
+                    :active-page-id="activePageId"
+                    :active-nav-id="activeNavId"
+                    :page="currentPage"
+                    @close="slotVisible['content-bottom'] = false"
+                  />
+                </div>
 
                 <!-- TOC -->
                 <KbRendererToc
@@ -184,7 +222,7 @@ import KbRendererSidebar from '../regions/KbRendererSidebar.vue'
 import KbRendererContent from '../regions/KbRendererContent.vue'
 import KbRendererToc from '../regions/KbRendererToc.vue'
 import KbRendererFooter from '../regions/KbRendererFooter.vue'
-import KbRendererSlot from '../KbRendererSlot.vue'
+import KbRendererSlotOutlet from '../KbRendererSlotOutlet.vue'
 
 const props = defineProps<{
   config: SiteRendererConfig
@@ -215,8 +253,10 @@ const mobileGithubHref = computed(() => {
 })
 const showMobileNavFooter = computed(() => Boolean(mobileGithubHref.value))
 
-const sidebarTopSlot = computed(() => props.config.slots['sidebar-top'] || null)
-const contentTopSlot = computed(() => props.config.slots['content-top'] || null)
+const hasSidebarTop = computed(() => (props.config.slots as any)['sidebar-top'] != null || !!props.config.extensions?.length)
+const hasContentTop = computed(() => (props.config.slots as any)['content-top'] != null || !!props.config.extensions?.length)
+const hasContentBottom = computed(() => (props.config.slots as any)['content-bottom'] != null || !!props.config.extensions?.length)
+const hasNavbarTrailing = computed(() => (props.config.slots as any)['navbar-trailing'] != null || !!props.config.extensions?.length)
 
 /** 至少有一个分组且含菜单节点时才显示侧栏列 */
 const hasSidebarTree = computed(() => {
@@ -318,6 +358,9 @@ function toggleMobileNav() {
   flex-shrink: 0;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+}
+.sr-docs-content-slot-bottom {
+  margin-top: 24px;
 }
 
 .sr-docs-content-scroll {
