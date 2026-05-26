@@ -58,6 +58,11 @@ public class KbController {
         return kbService.publish(docId, siteKey);
     }
 
+    @PostMapping("/docs/{docId}/unpublish")
+    public Result<KbDocDTO> unpublish(@PathVariable Long docId, @RequestParam(required = false) String siteKey) {
+        return kbService.unpublish(docId, siteKey);
+    }
+
     @DeleteMapping("/docs/{docId}")
     public Result<Void> delete(@PathVariable Long docId, @RequestParam(required = false) String siteKey) {
         return kbService.delete(docId, siteKey);
@@ -132,21 +137,7 @@ public class KbController {
     }
 
     // ==================== 站点导航（站点端） ====================
-
-    /** 站点端导航树（kb_nav_node，无文档正文） */
-    @GetMapping("/site/nav/tree")
-    public Result<List<KbNavNodeDTO>> siteNavTree(
-            @RequestParam(defaultValue = "sidebar") String menuCode,
-            @RequestParam(required = false) String siteKey
-    ) {
-        return kbService.siteGetNavTree(menuCode, siteKey);
-    }
-
-    /** 根据 URL（路径）匹配站点，如 /docs/java/getting-started => routePrefix=/docs/java 的站点 */
-    @GetMapping("/site/resolve")
-    public Result<KbSiteDTO> siteResolve(@RequestParam String urlPath) {
-        return kbService.siteResolve(urlPath);
-    }
+    // 站点端匿名接口已迁至 {@link KbAnonController}（/plugins/kb/anon/site/...）
 
     // ==================== 站点构建器配置（SiteRendererConfig JSON） ====================
 

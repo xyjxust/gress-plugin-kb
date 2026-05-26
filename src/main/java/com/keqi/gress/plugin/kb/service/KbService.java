@@ -104,6 +104,21 @@ public class KbService {
         return Result.success(toDto(doc));
     }
 
+    /** 免登录读取：仅返回已发布文档，避免暴露草稿 */
+    public Result<KbDocDTO> getDocPublished(Long docId, String siteKey) {
+        KbDoc doc = docDao.findByIdOrNull(docId);
+        if (doc == null) {
+            return Result.error("文档不存在");
+        }
+        if (!Objects.equals(doc.getSpaceId(), ensureSpace(siteKey))) {
+            return Result.error("文档不属于当前站点");
+        }
+        if (!"PUBLISHED".equalsIgnoreCase(doc.getStatus())) {
+            return Result.error("文档未发布");
+        }
+        return Result.success(toDto(doc));
+    }
+
     public Result<KbDocDTO> createDoc(UpsertKbDocRequest req, String siteKey) {
         Long spaceId = ensureSpace(siteKey);
         if (req.getTitle() == null || req.getTitle().trim().isEmpty()) {
@@ -221,6 +236,38 @@ public class KbService {
                 log.warn("删除旧静态文件失败: url={}", oldStaticUrl, e);
             }
         }
+        return Result.success(toDto(doc));
+    }
+
+    /** 取消发布：恢复为草稿，站点匿名接口不再可读；编辑器类型会尽量删除已上传的静态 HTML */
+    public Result<KbDocDTO> unpublish(Long docId, String siteKey) {
+        KbDoc doc = docDao.findByIdOrNull(docId);
+        if (doc == null) {
+            return Result.error("文档不存在");
+        }
+        if (!Objects.equals(doc.getSpaceId(), ensureSpace(siteKey))) {
+            return Result.error("文档不属于当前站点");
+        }
+        if (!"PUBLISHED".equalsIgnoreCase(doc.getStatus())) {
+            return Result.error("当前不是已发布状态");
+        }
+        String oldStaticUrl = doc.getStaticHtmlUrl();
+        if (oldStaticUrl != null && !oldStaticUrl.isBlank()
+                && "EDITOR".equalsIgnoreCase(String.valueOf(doc.getDocType()))) {
+            try {
+                fileStorageService.delete(oldStaticUrl).execute();
+            } catch (Exception e) {
+                log.warn("取消发布时删除静态文件失败: url={}", oldStaticUrl, e);
+            }
+        }
+        doc.setStatus("DRAFT");
+        doc.setPublishedAt(null);
+        doc.setBodyHtml(null);
+        doc.setStaticHtmlUrl(null);
+        doc.setStaticVersion(0);
+        doc.setVersion((doc.getVersion() == null ? 1 : doc.getVersion()) + 1);
+        doc.setUpdatedAt(LocalDateTime.now());
+        docDao.updateById(doc);
         return Result.success(toDto(doc));
     }
 

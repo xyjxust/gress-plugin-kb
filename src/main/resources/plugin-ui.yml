@@ -4,6 +4,12 @@ plugin:
   version: 1.0.1
   hasWidget: false
   hasPanel: false
+  surfaces:
+    admin: true
+    consumer: true
+  autoLoad:
+    admin: true
+    consumer: true
 
 menus:
   - id: kb-docs
@@ -30,6 +36,9 @@ menus:
       - id: publish
         label: 发布
         path: POST:/api/v2/plugins/kb/kb/docs/{docId}/publish
+      - id: unpublish
+        label: 取消发布
+        path: POST:/api/v2/plugins/kb/kb/docs/{docId}/unpublish
       - id: delete
         label: 删除
         path: DELETE:/api/v2/plugins/kb/kb/docs/{docId}
@@ -51,16 +60,6 @@ menus:
         label: 发布导航
         path: POST:/api/v2/plugins/kb/kb/admin/nav/publish
 
-  - id: kb-site-access
-    title: 站点访问
-    icon: GlobeOutline
-    path: /sites
-    component: KbSitePreview
-    order: 5
-    type: 'standalone'
-    operations:
-      - VIEW
-
 roles:
   - code: viewer
     name: 知识库查看者
@@ -68,7 +67,6 @@ roles:
     permissions:
       - kb-docs:VIEW
       - kb-site:VIEW
-      - kb-site-access:VIEW
   - code: editor
     name: 知识库编辑者
     description: 可编辑与发布文档
@@ -77,6 +75,4 @@ roles:
       - kb-docs.*
       - kb-site:VIEW,MANAGE
       - kb-site.*
-      - kb-site-access:VIEW
-      - kb-site-access.*
 

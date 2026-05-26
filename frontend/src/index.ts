@@ -7,6 +7,7 @@ import KbSiteWorkspaceManage from './views/KbSiteWorkspaceManage.vue'
 import KbSiteConfigManage from './views/KbSiteConfigManage.vue'
 import KbSitePreview from './views/KbSitePreview.vue'
 import KbSiteVisualBuilder from './views/KbSiteVisualBuilder.vue'
+import { RichTextEditor as KbRichTextEditor } from '@keqi.gress/plugin-ui'
 
 // Demo: third-party extension + shared config panel (for测绘)
 import { registerHelloWorldThirdPartyExtension } from './components/site-renderer/extensions/examples/ThirdPartyHelloExtension'
@@ -51,6 +52,8 @@ export default (bridge: any, properties?: KbFrontendConfig) => {
       KbSiteVisualBuilder
     },
     extensions: {
+      // 公开路由：在对应 route 上设置 meta.requiresAuth: false。
+      // 宿主 plugin-runtime 会汇总到 GressBridge.auth.getPublicRoutePrefixes()，IAM 等插件可读；路由守卫也会放行。
       routes: [
         // 独立站点访问（standalone）：/sites + 任意子路径
         {
@@ -58,7 +61,7 @@ export default (bridge: any, properties?: KbFrontendConfig) => {
           name: 'kb-site-access',
           component: KbSitePreview,
           type: 'standalone',
-          meta: { title: '站点访问', pluginId: 'kb' }
+          meta: { title: '站点访问', pluginId: 'kb', requiresAuth: false, appScopes: ['public-web'] }
         },
         {
           path: '/plugins/kb/docs',
@@ -124,7 +127,7 @@ export default (bridge: any, properties?: KbFrontendConfig) => {
           path: '/plugins/kb/site-preview',
           name: 'kb-site-preview',
           component: KbSitePreview,
-          meta: { title: '站点预览', pluginId: 'kb' }
+          meta: { title: '站点预览', pluginId: 'kb', requiresAuth: false, appScopes: ['public-web'] }
         },
         {
           path: '/plugins/kb/site-visual-builder',
@@ -159,6 +162,14 @@ export default (bridge: any, properties?: KbFrontendConfig) => {
           category: 'site-renderer.page',
           name: 'KbStartPage',
           component: KbStartPage,
+        },
+        /** 共享富文本编辑器（供其它插件表单/弹窗内嵌使用） */
+        {
+          global: true,
+          category: 'richtext.editor',
+          name: 'KbRichTextEditor',
+          title: '富文本编辑器',
+          component: KbRichTextEditor,
         },
       ],
       menus: [],

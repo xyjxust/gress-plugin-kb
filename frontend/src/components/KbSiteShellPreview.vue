@@ -81,7 +81,7 @@ async function loadDoc(id: number | null) {
   }
   docLoading.value = true
   try {
-    doc.value = await kbApi.getDoc(id)
+    doc.value = await kbApi.getDoc(id, undefined, props.variant === 'published' ? 'public' : 'full')
   } catch {
     doc.value = null
   } finally {

@@ -85,6 +85,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useMessage, useRoute } from '@keqi.gress/plugin-bridge'
 import { PageHeader } from '@keqi.gress/plugin-ui'
 import { kbApi } from '../api/kb'
+import { kbHasAuthToken } from '../utils/kbSession'
 import type { KbDoc, KbNavNode, KbSite, KbTreeNode } from '../types/kb'
 import type { AreaConfigMap, AreaKey, BuilderComponentInstance, BuilderDataSource, BuilderDataSourceOption, CanvasSlot, PreviewMode, SiteThemeConfig, ThemePresetId, ThemeScheme } from '../types/siteBuilder'
 import { buildSiteThemeVars, cloneSiteTheme, createBuiltinThemeSchemes, createDefaultSiteTheme, createSiteThemePreset, extractTocItems, findPrevNextDocs, resolveBlockTheme } from '../utils/siteBuilder'
@@ -844,7 +845,7 @@ async function loadAll() {
     // 站点列表（用于站点切换）
     if (!sites.value.length) {
       try {
-        sites.value = await kbApi.listSites()
+        sites.value = await kbApi.listSites(kbHasAuthToken() ? 'full' : 'public')
         if (!sites.value.some((s) => s.spaceKey === activeSiteKey.value)) {
           activeSiteKey.value = sites.value.find((s) => s.spaceKey === 'default')?.spaceKey || sites.value[0]?.spaceKey || 'default'
         }
@@ -858,7 +859,7 @@ async function loadAll() {
       kbApi.adminNavTree('header', activeSiteKey.value || undefined),
       kbApi.siteNavTree('sidebar', activeSiteKey.value || undefined),
       kbApi.siteNavTree('header', activeSiteKey.value || undefined),
-      kbApi.tree(activeSiteKey.value || undefined)
+      kbApi.tree(activeSiteKey.value || undefined, kbHasAuthToken() ? 'full' : 'public')
     ])
     draftSidebarTree.value = side
     draftHeaderTree.value = head

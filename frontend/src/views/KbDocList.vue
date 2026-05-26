@@ -129,12 +129,12 @@ import { useDialog } from 'naive-ui'
 import { PageHeader, FilterPanel } from '@keqi.gress/plugin-ui'
 import type { FilterFieldConfig } from '@keqi.gress/plugin-ui'
 import { kbApi } from '../api/kb'
+import { kbHasAuthToken } from '../utils/kbSession'
 import type { KbSite, KbTreeNode } from '../types/kb'
 
 const Add = useIcon('AddOutline')
 const Refresh = useIcon('RefreshOutline')
 const Edit = useIcon('CreateOutline')
-const OpenOutline = useIcon('OpenOutline')
 const TrashOutline = useIcon('TrashOutline')
 
 const message = useMessage()
@@ -175,6 +175,8 @@ function currentSiteKey(): string {
 
 const loading = ref(false)
 const refreshLoading = ref(false)
+/** 发布/取消发布行内 loading */
+const publishActionDocId = ref<number | null>(null)
 const tree = ref<KbTreeNode[]>([])
 const showAdvanced = ref(false)
 
@@ -268,7 +270,9 @@ function formatDocType(t?: string) {
   return '编辑器'
 }
 
-const columns: any[] = [
+const columns = computed(() => {
+  const busyId = publishActionDocId.value
+  return [
   {
     title: 'ID',
     key: 'id',
@@ -317,12 +321,39 @@ const columns: any[] = [
   {
     title: '操作',
     key: 'actions',
-    width: 220,
+    width: 268,
     fixed: 'right',
     render: (row: FlatRow) => {
       const NButton = resolveComponent('NButton') as any
       const NSpace = resolveComponent('NSpace') as any
       const NIcon = resolveComponent('NIcon') as any
+      const busy = busyId === row.id
+      const pubLocked = busyId !== null && !busy
+      const pubBtn =
+        row.status === 'PUBLISHED'
+          ? h(
+              NButton,
+              {
+                size: 'small',
+                quaternary: true,
+                loading: busy,
+                disabled: busy || pubLocked,
+                onClick: () => confirmUnpublish(row)
+              },
+              { default: () => '取消发布' }
+            )
+          : h(
+              NButton,
+              {
+                size: 'small',
+                type: 'success',
+                secondary: true,
+                loading: busy,
+                disabled: busy || pubLocked,
+                onClick: () => void handlePublish(row)
+              },
+              { default: () => '发布' }
+            )
       return h(
         NSpace,
         { size: 8, wrap: false },
@@ -330,17 +361,10 @@ const columns: any[] = [
           default: () => [
             h(
               NButton,
-              { size: 'small', type: 'primary', secondary: true, onClick: () => openEdit(row.id, false) },
+              { size: 'small', type: 'primary', secondary: true, onClick: () => openEdit(row.id) },
               { default: () => '编辑' }
             ),
-            h(
-              NButton,
-              { size: 'small', quaternary: true, onClick: () => openEdit(row.id, true) },
-              {
-                icon: () => h(NIcon, { component: OpenOutline }),
-                default: () => '新标签'
-              }
-            ),
+            pubBtn,
             h(
               NButton,
               { size: 'small', quaternary: true, type: 'error', onClick: () => confirmDelete(row) },
@@ -354,7 +378,8 @@ const columns: any[] = [
       )
     }
   }
-]
+  ] as any[]
+})
 
 /** 与当前列表 URL 同级的编辑页路径（兼容应用 base，如 /gress）；bridge.router 无 resolve */
 function editorPath(docId: number | 'new'): string {
@@ -375,15 +400,49 @@ function componentEditorPath(docId: number): string {
   return `${prefix}/plugins/kb/docs/component/${docId}`
 }
 
-function openEdit(docId: number, newTab: boolean) {
+function openEdit(docId: number) {
   const row = flatRows.value.find((r) => r.id === docId) as any
   const dt = String(row?.docType || 'EDITOR').toUpperCase()
   const path = dt === 'COMPONENT' ? componentEditorPath(docId) : editorPath(docId)
-  if (newTab) {
-    window.open(`${window.location.origin}${path}`, '_blank')
-  } else {
-    void router.push(path)
+  void router.push(path)
+}
+
+async function handlePublish(row: FlatRow) {
+  if (publishActionDocId.value != null) return
+  publishActionDocId.value = row.id
+  try {
+    await kbApi.publish(row.id, currentSiteKey())
+    message.success('已发布')
+    await loadData()
+  } catch (e: any) {
+    message.error(e?.message || '发布失败')
+  } finally {
+    publishActionDocId.value = null
   }
+}
+
+function confirmUnpublish(row: FlatRow) {
+  dialog.warning({
+    title: '取消发布',
+    content: `将「${row.title || row.id}」恢复为草稿，访客将无法通过公开站点阅读该文档。确定？`,
+    positiveText: '取消发布',
+    negativeText: '关闭',
+    onPositiveClick: async () => {
+      if (publishActionDocId.value != null) return false
+      publishActionDocId.value = row.id
+      try {
+        await kbApi.unpublish(row.id, currentSiteKey())
+        message.success('已取消发布')
+        await loadData()
+        return true
+      } catch (e: any) {
+        message.error(e?.message || '操作失败')
+        return false
+      } finally {
+        publishActionDocId.value = null
+      }
+    }
+  })
 }
 
 function confirmDelete(row: FlatRow) {
@@ -452,7 +511,7 @@ async function submitCreate() {
 
 async function loadSites() {
   try {
-    sites.value = await kbApi.listSites()
+    sites.value = await kbApi.listSites(kbHasAuthToken() ? 'full' : 'public')
   } catch {
     sites.value = []
   }
@@ -462,7 +521,7 @@ async function loadData() {
   loading.value = true
   refreshLoading.value = true
   try {
-    tree.value = await kbApi.tree(currentSiteKey())
+    tree.value = await kbApi.tree(currentSiteKey(), kbHasAuthToken() ? 'full' : 'public')
   } catch (e: any) {
     message.error(e?.message || '加载失败')
   } finally {

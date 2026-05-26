@@ -58,6 +58,7 @@ import { useMessage, useRouter } from '@keqi.gress/plugin-bridge'
 import type { DataTableColumns } from 'naive-ui'
 import { NButton, NSpace, NTag } from 'naive-ui'
 import { kbApi } from '../api/kb'
+import { kbHasAuthToken } from '../utils/kbSession'
 import type { KbSite, UpsertKbSiteRequest } from '../types/kb'
 
 const message = useMessage()
@@ -181,7 +182,7 @@ async function resolveByPath() {
 async function loadSites() {
   loading.value = true
   try {
-    sites.value = await kbApi.listSites()
+    sites.value = await kbApi.listSites(kbHasAuthToken() ? 'full' : 'public')
   } catch (e: any) {
     message.error(e?.message || '加载站点失败')
   } finally {

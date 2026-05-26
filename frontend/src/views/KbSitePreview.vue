@@ -374,6 +374,9 @@ function getHydrateConfig(): SiteRendererConfig {
 function resolveCurrentPath(): string {
   if (typeof window === 'undefined') return '/'
   const { pathname, hash } = window.location
+  // history 路由：/sites/... 需要映射为站点真实路径
+  if (pathname.startsWith('/sites/')) return pathname.slice('/sites'.length) || '/'
+  if (pathname === '/sites') return '/'
   // 兼容 hash 路由：#/sites/... 或 #/sites/...?... 形式
   if (hash.startsWith('#/')) {
     const h = hash.slice(1) // 去掉前导 #
@@ -442,7 +445,7 @@ async function hydratePageDoc(pageId: string) {
   meta.kbDocLoading = true
   p.meta = meta
   try {
-    const d: KbDoc = await kbApi.getDoc(docId, effectiveSiteKey.value || undefined)
+    const d: KbDoc = await kbApi.getDoc(docId, effectiveSiteKey.value || undefined, 'public')
     p.title = d.title || p.title
     p.updatedAt = d.updatedAt || p.updatedAt
     const dt = String((d as any).docType || 'EDITOR').toUpperCase()
@@ -617,7 +620,18 @@ onMounted(async () => {
     window.addEventListener('focus', onThemeChangeHandler)
   }
 
-  if (!canUseKbPreview.value) return
+  // 构建器嵌入：预拉 anon/tree、anon/sites，避免未登录时误请求 /kb/tree、/admin/sites
+  if (!canUseKbPreview.value) {
+    const sk = String(props.siteKey || '').trim()
+    if (sk) {
+      try {
+        await Promise.all([kbApi.listSites(), kbApi.tree(sk)])
+      } catch {
+        /* 不阻断画布：目录拉取失败时由构建器其它逻辑兜底 */
+      }
+    }
+    return
+  }
   kbLoading.value = true
   try {
     const requestedPath = resolveCurrentPath()
@@ -657,6 +671,8 @@ onMounted(async () => {
     const [head, side] = await Promise.all([
       kbApi.siteNavTree('header', resolvedSiteKey.value || undefined),
       kbApi.siteNavTree('sidebar', resolvedSiteKey.value || undefined),
+      kbApi.listSites(),
+      kbApi.tree(resolvedSiteKey.value || undefined),
     ])
     if (publishedLinks === 0) {
       kbSiteConfig.navbar.links = mapHeaderNavToNavbarLinks(head || [])

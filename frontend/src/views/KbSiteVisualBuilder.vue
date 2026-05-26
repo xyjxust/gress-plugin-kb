@@ -907,6 +907,7 @@ import type { KbDoc } from '../types/kb'
 import KbSitePreview from './KbSitePreview.vue'
 import { sidebarTreeMapKeysForLookup } from '../utils/siteRenderer'
 import { kbApi } from '../api/kb'
+import { kbHasAuthToken } from '../utils/kbSession'
 import type { KbTreeNode } from '../types/kb'
 import AuthNavbarPanel from '../components/site-renderer/extensions/panels/AuthNavbarPanel.vue'
 import DocCommentsPanel from '../components/site-renderer/extensions/panels/DocCommentsPanel.vue'
@@ -3327,9 +3328,15 @@ function confirmNewPage() {
 /** 只拉取知识库目录供关联使用，不替换站点页面与侧栏结构 */
 async function loadKbDocCatalog() {
   loadingKb.value = true
+  const sk = siteKey.value || undefined
   try {
-    kbDocCatalogTree.value = await kbApi.tree(siteKey.value || undefined)
-    message.success('知识库目录已同步，可在「从文档库添加页面」中关联文档')
+    if (kbHasAuthToken()) {
+      kbDocCatalogTree.value = await kbApi.tree(sk, 'full')
+      message.success('知识库目录已同步，可在「从文档库添加页面」中关联文档')
+    } else {
+      kbDocCatalogTree.value = await kbApi.tree(sk)
+      message.success('知识库目录已同步（免登录，与站点预览同源 anon/tree）')
+    }
     await reconcileKbDocPagesFromBindings()
     await hydrateKbDocsForCurrentPages()
   } catch {
