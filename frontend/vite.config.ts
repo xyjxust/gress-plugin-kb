@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
+import { createPluginRollupOptions } from '../../gress/gress-plugin-packages/plugin-vite-externals.ts'
 
 export default defineConfig({
   plugins: [vue()],
@@ -8,7 +9,7 @@ export default defineConfig({
     'process.env': {}
   },
   build: {
-    minify: false,
+    minify: true,
     cssCodeSplit: true,
     lib: {
       entry: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
@@ -16,16 +17,6 @@ export default defineConfig({
       formats: ['iife'],
       fileName: () => 'kb-frontend.umd.js'
     },
-    rollupOptions: {
-      external: ['vue', 'naive-ui'],
-      output: {
-        globals: {
-          vue: 'Vue',
-          'naive-ui': 'NaiveUI'
-        },
-        exports: 'named'
-      }
-    }
+    rollupOptions: createPluginRollupOptions()
   }
 })
-
